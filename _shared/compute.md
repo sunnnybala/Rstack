@@ -7,7 +7,7 @@ Claude runs these commands directly, same pattern as GStack running `git push`.
 
 Before any cloud operation, verify Modal is authenticated:
 ```bash
-modal token show
+modal token info
 ```
 If this fails, tell user: "Modal not authenticated. Run `! modal token new` to log in."
 

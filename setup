@@ -84,8 +84,10 @@ fi
 echo ""
 "$SOURCE_DIR/bin/rstack-compute-detect" 2>/dev/null || true
 
-# ─── Mark setup complete ─────────────────────────────────────
-touch "$HOME/.rstack/.setup-complete"
+# ─── Mark INSTALL complete (not provider setup) ─────────────
+# .install-complete = bootstrap done (symlinks, config, dirs)
+# .setup-complete = created by /setup skill ONLY after provider auth
+touch "$HOME/.rstack/.install-complete"
 
 echo ""
 echo "=== RStack v$(cat "$SOURCE_DIR/VERSION") installed ==="

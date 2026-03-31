@@ -46,11 +46,11 @@ Use AskUserQuestion:
 > B) Skip — I'll use local GPU only
 > C) Skip — I'll install it later
 
-If A: Run `pip install modal`. Then run `modal token new` — this opens a browser for authentication. Wait for user to complete. Verify with `modal token show`.
+If A: Run `pip install modal`. Then run `modal token new` — this opens a browser for authentication. Wait for user to complete. Verify with `modal token info`.
 
 **If Modal installed but NOT authenticated:**
 Tell user: "Modal is installed but not authenticated."
-Run: Tell the user to execute `modal token new` in their terminal (or type `! modal token new` in Claude Code's prompt to run it in-session). Verify with `modal token show`.
+Run: Tell the user to execute `modal token new` in their terminal (or type `! modal token new` in Claude Code's prompt to run it in-session). Verify with `modal token info`.
 
 **If Modal installed AND authenticated:**
 Tell user: "Modal is configured. Default GPU will be A100."

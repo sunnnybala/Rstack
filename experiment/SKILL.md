@@ -48,7 +48,7 @@ Verify Modal is available and authenticated:
 
 ```bash
 command -v modal >/dev/null 2>&1 && echo "MODAL_INSTALLED" || echo "MODAL_MISSING"
-modal token show >/dev/null 2>&1 && echo "MODAL_AUTH_OK" || echo "MODAL_AUTH_FAIL"
+modal token info >/dev/null 2>&1 && echo "MODAL_AUTH_OK" || echo "MODAL_AUTH_FAIL"
 ```
 
 - If `MODAL_MISSING`: tell user "Modal not installed. Run `pip install modal`" and STOP.

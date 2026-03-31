@@ -8,7 +8,7 @@ echo "=== RStack Compute Detection ==="
 if command -v modal >/dev/null 2>&1; then
   MODAL_VER=$(modal --version 2>/dev/null || echo "unknown")
   echo "MODAL_INSTALLED: true ($MODAL_VER)"
-  if modal token show >/dev/null 2>&1; then
+  if modal token info >/dev/null 2>&1; then
     echo "MODAL_AUTHENTICATED: true"
   else
     echo "MODAL_AUTHENTICATED: false"
