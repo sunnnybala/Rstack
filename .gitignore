@@ -1,0 +1,23 @@
+# RStack state (per-project, not committed)
+.rstack/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+
+# Node (if any tooling added later)
+node_modules/
