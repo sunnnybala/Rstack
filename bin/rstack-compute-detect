@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# rstack-compute-detect — check available compute providers
+set -euo pipefail
+
+echo "=== RStack Compute Detection ==="
+
+# Modal
+if command -v modal >/dev/null 2>&1; then
+  MODAL_VER=$(modal --version 2>/dev/null || echo "unknown")
+  echo "MODAL_INSTALLED: true ($MODAL_VER)"
+  if modal token show >/dev/null 2>&1; then
+    echo "MODAL_AUTHENTICATED: true"
+  else
+    echo "MODAL_AUTHENTICATED: false"
+    echo "  Run: modal token new"
+  fi
+else
+  echo "MODAL_INSTALLED: false"
+  echo "  Install: pip install modal"
+fi
+
+# Local GPU
+if command -v nvidia-smi >/dev/null 2>&1; then
+  GPU_NAME=$(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null | head -1 || echo "unknown")
+  echo "LOCAL_GPU: true ($GPU_NAME)"
+else
+  echo "LOCAL_GPU: false"
+fi
+
+# tectonic (LaTeX)
+if command -v tectonic >/dev/null 2>&1; then
+  echo "TECTONIC: true"
+elif command -v pdflatex >/dev/null 2>&1; then
+  echo "PDFLATEX: true"
+else
+  echo "LATEX: false"
+  echo "  Install tectonic: https://tectonic-typesetting.github.io/"
+fi

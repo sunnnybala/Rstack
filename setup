@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+# rstack setup — register research skills with Claude Code
+set -e
+
+INSTALL_DIR="$(cd "$(dirname "$0")" && pwd)"
+SOURCE_DIR="$(cd "$(dirname "$0")" && pwd -P)"
+SKILLS_DIR="$(dirname "$INSTALL_DIR")"
+
+IS_WINDOWS=0
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*|Windows_NT) IS_WINDOWS=1 ;;
+esac
+
+# ─── Parse flags ──────────────────────────────────────────────
+LOCAL_INSTALL=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --local) LOCAL_INSTALL=1; shift ;;
+    *) shift ;;
+  esac
+done
+
+# ─── Check Python ─────────────────────────────────────────────
+if ! command -v python3 >/dev/null 2>&1 && ! command -v python >/dev/null 2>&1; then
+  echo "Error: Python 3.8+ is required but not installed." >&2
+  echo "Install from https://python.org or your package manager." >&2
+  exit 1
+fi
+
+PYTHON_CMD="python3"
+command -v python3 >/dev/null 2>&1 || PYTHON_CMD="python"
+PY_VER=$($PYTHON_CMD --version 2>&1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
+echo "Python: $PYTHON_CMD ($PY_VER)"
+
+# ─── Create state directory ──────────────────────────────────
+mkdir -p "$HOME/.rstack/analytics"
+mkdir -p "$HOME/.rstack/projects"
+
+# ─── Write default config if missing ─────────────────────────
+RSTACK_CONFIG="$SOURCE_DIR/bin/rstack-config"
+if [ ! -f "$HOME/.rstack/config.yaml" ]; then
+  "$RSTACK_CONFIG" set compute_preferred "modal"
+  "$RSTACK_CONFIG" set venue "arxiv"
+  "$RSTACK_CONFIG" set experiment_checkpoint "3"
+  "$RSTACK_CONFIG" set proactive "true"
+  "$RSTACK_CONFIG" set telemetry "off"
+  echo "Config written to ~/.rstack/config.yaml"
+fi
+
+# ─── Symlink skill directories ───────────────────────────────
+# Each directory with a SKILL.md gets symlinked into ~/.claude/skills/
+SKILL_DIRS="lit-review novelty-check experiment analyze-results write-paper research setup-skill"
+
+echo ""
+echo "Linking skills into $SKILLS_DIR ..."
+
+for dir in $SKILL_DIRS; do
+  if [ -f "$INSTALL_DIR/$dir/SKILL.md" ]; then
+    # Read skill name from frontmatter
+    SKILL_NAME=$(grep -m1 "^name:" "$INSTALL_DIR/$dir/SKILL.md" 2>/dev/null | awk '{print $2}' || echo "$dir")
+
+    TARGET="$SKILLS_DIR/$SKILL_NAME"
+
+    if [ "$IS_WINDOWS" -eq 1 ]; then
+      # Windows: use directory junction or copy (symlinks need elevated perms)
+      if [ -d "$TARGET" ] && [ ! -L "$TARGET" ]; then
+        rm -rf "$TARGET"
+      fi
+      # Try symlink first, fall back to copy
+      ln -snf "$INSTALL_DIR/$dir" "$TARGET" 2>/dev/null || cp -rf "$INSTALL_DIR/$dir" "$TARGET"
+    else
+      ln -snf "$INSTALL_DIR/$dir" "$TARGET"
+    fi
+    echo "  /$SKILL_NAME -> $dir/"
+  fi
+done
+
+# Also link the root SKILL.md (rstack routing skill)
+if [ -f "$INSTALL_DIR/SKILL.md" ]; then
+  echo "  /rstack -> ./"
+fi
+
+# ─── Detect compute providers (informational) ────────────────
+echo ""
+"$SOURCE_DIR/bin/rstack-compute-detect" 2>/dev/null || true
+
+# ─── Mark setup complete ─────────────────────────────────────
+touch "$HOME/.rstack/.setup-complete"
+
+echo ""
+echo "=== RStack v$(cat "$SOURCE_DIR/VERSION") installed ==="
+echo "Run /research in Claude Code to start."
+echo "Run /setup in Claude Code to configure compute providers."
+echo ""

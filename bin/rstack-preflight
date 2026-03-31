@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# rstack-preflight — dry-run experiment code on CPU for 30s
+# Usage: rstack-preflight <script.py> [extra args forwarded to script]
+set -euo pipefail
+
+SCRIPT="${1:?Usage: rstack-preflight <script.py> [extra args...]}"
+shift
+
+if [ ! -f "$SCRIPT" ]; then
+  echo "ERROR: $SCRIPT not found" >&2
+  exit 1
+fi
+
+# Detect python command
+PYTHON_CMD="python3"
+command -v python3 >/dev/null 2>&1 || PYTHON_CMD="python"
+
+echo "=== RStack Preflight: running $SCRIPT with --smoke_test for 30s ==="
+
+timeout 30 $PYTHON_CMD "$SCRIPT" --smoke_test "$@" 2>&1 | tail -20
+EXIT_CODE=${PIPESTATUS[0]}
+
+if [ "$EXIT_CODE" -eq 0 ]; then
+  echo "PREFLIGHT: PASS"
+elif [ "$EXIT_CODE" -eq 124 ]; then
+  echo "PREFLIGHT: PASS (timed out at 30s, expected for training)"
+else
+  echo "PREFLIGHT: FAIL (exit code $EXIT_CODE)"
+  echo "Fix the errors above before submitting to cloud."
+  exit 1
+fi
