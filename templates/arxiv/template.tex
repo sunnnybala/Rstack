@@ -1,0 +1,124 @@
+% RStack arXiv Template
+% Clean article-class LaTeX template for arXiv preprints.
+% Usage: Copy to .rstack/paper.tex, fill in sections, compile with tectonic or pdflatex.
+
+\documentclass[11pt]{article}
+
+% --- Page geometry ---
+\usepackage[margin=1in]{geometry}
+
+% --- Standard packages ---
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{natbib}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+% --- Hyperref setup ---
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue,
+}
+
+% ============================================================================
+% RSTACK METADATA -- Replace the placeholders below
+% ============================================================================
+
+%RSTACK:TITLE
+\title{Paper Title}
+
+%RSTACK:AUTHORS
+\author{
+  Author One\thanks{Corresponding author: \texttt{author@example.com}} \\
+  Affiliation \\
+  \texttt{author@example.com}
+}
+
+%RSTACK:DATE
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+% ============================================================================
+%RSTACK:ABSTRACT
+% ============================================================================
+\begin{abstract}
+Abstract text goes here. State the problem, summarize the method, report key
+quantitative results, and draw a conclusion. 150--250 words.
+\end{abstract}
+
+% ============================================================================
+%RSTACK:INTRODUCTION
+% ============================================================================
+\section{Introduction}
+\label{sec:introduction}
+
+% Motivation, gap in existing work, contribution statement, paper outline.
+
+% ============================================================================
+%RSTACK:RELATED_WORK
+% ============================================================================
+\section{Related Work}
+\label{sec:related-work}
+
+% Group by theme, cite with \cite{key}, note how this work differs.
+
+% ============================================================================
+%RSTACK:METHOD
+% ============================================================================
+\section{Method}
+\label{sec:method}
+
+% Problem formulation, approach overview, architecture/algorithm details.
+
+% ============================================================================
+%RSTACK:EXPERIMENTS
+% ============================================================================
+\section{Experiments}
+\label{sec:experiments}
+
+% Setup: datasets, baselines, hyperparameters, compute environment.
+
+\subsection{Results}
+\label{sec:results}
+
+% Tables and figures with real metrics from .rstack/experiments.jsonl.
+% Example table:
+% \begin{table}[t]
+% \centering
+% \caption{Main results.}
+% \label{tab:main-results}
+% \begin{tabular}{lcc}
+% \toprule
+% Method & Metric 1 & Metric 2 \\
+% \midrule
+% Baseline & X.XX & Y.YY \\
+% Ours & X.XX & Y.YY \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+
+% ============================================================================
+%RSTACK:CONCLUSION
+% ============================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+% Summary, limitations, future work.
+
+% ============================================================================
+% References
+% ============================================================================
+\bibliographystyle{plainnat}
+\bibliography{paper}
+
+\end{document}
