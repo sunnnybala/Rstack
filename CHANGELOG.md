@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.2] - 2026-04-01 — Multi-File Experiments
+
+### Changed
+
+- **Experiment skill now supports multiple code files.** Claude can create helper modules (models.py, data.py, utils.py) alongside train.py instead of cramming everything into one file. train.py remains the entry point for preflight and Modal execution.
+
 ## [0.1.1] - 2026-04-01 — File Storage Refactor
 
 ### Changed

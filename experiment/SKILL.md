@@ -120,9 +120,11 @@ Use AskUserQuestion:
 
 ## Step 3: Code Generation
 
-Generate `train.py` and `requirements.txt` in the project directory.
+Generate experiment code in the project directory. The entry point must be `train.py` (this is what preflight and `modal run` execute). Create additional modules as needed for clean code organization (e.g., `models.py`, `data.py`, `utils.py`, `evaluate.py`). Also generate `requirements.txt`.
 
-**Mandatory code rules** (from Ignis experiment-coder-agent pattern):
+Helper modules don't need Modal decorators or argparse. They're imported by `train.py`. Only the entry point needs the mandatory rules below.
+
+**Mandatory rules for `train.py`** (the entry point):
 
 1. **argparse interface:**
    ```python
