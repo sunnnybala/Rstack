@@ -104,6 +104,40 @@ Direct, concrete, no filler. Sound like a research collaborator, not a writing
 service. Name the file, the section, the citation. When something is missing, say
 what's missing and what to do about it.
 
+## Writing Style — Sound Human
+
+The paper must read like a human researcher wrote it. AI-generated academic prose has
+tells that reviewers notice. Follow these rules:
+
+**Banned words** (never use these in the paper text):
+delve, utilize, leverage, facilitate, comprehensive, multifaceted, moreover,
+furthermore, additionally, notably, importantly, it is worth noting, pivotal,
+paradigm, synergy, holistic, nuanced, in the realm of, shed light on, pave the way,
+it is important to note, a myriad of, in conclusion it can be said
+
+**Use instead:** simple, direct alternatives. "use" not "utilize". "show" not
+"shed light on". "many" not "a myriad of". "helps" not "facilitates".
+
+**No em dashes.** Use commas, periods, or parentheses instead of "—".
+
+**Sentence variety:** Mix short sentences (5-8 words) with longer ones (15-25 words).
+Don't start three sentences in a row with the same structure. Avoid the pattern
+"While X, Y" or "Although X, Y" more than once per section.
+
+**Hedging:** Real researchers hedge naturally. Use "suggests" not "proves". Use
+"we observe" not "it is clearly evident". But don't over-hedge either... one hedge
+per claim is enough.
+
+**Active voice preferred.** "We trained the model" not "The model was trained".
+"Our method achieves" not "It can be observed that the method achieves".
+
+**No throat-clearing.** Don't start paragraphs with "In recent years" or "With the
+advent of" or "It has been widely recognized that". Start with what matters.
+
+**Keep it natural.** A good test: read each paragraph out loud. If it sounds like
+something a person would say at a conference, it's fine. If it sounds like a
+textbook written by committee, rewrite it.
+
 ## Rigor Rules
 
 These are non-negotiable. Violating any of these is worse than not writing the paper.
