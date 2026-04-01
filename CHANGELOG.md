@@ -7,7 +7,7 @@
 - **Work products now live at the project root** as normal, visible files (idea.md, paper.tex, analysis/, results/, etc.) instead of being hidden inside `.rstack/`.
 - **`.rstack/` now only holds plumbing** — structured JSONL logs (lit-review.jsonl, experiments.jsonl).
 - **All preambles resolve the git root** via `git rev-parse --show-toplevel`, fixing a bug where files could land in the wrong directory if Claude's CWD wasn't the project root.
-- Updated all 7 SKILL.md files, shared references, templates, and documentation.
+- Updated all 8 SKILL.md files, shared references, templates, and documentation.
 
 ## [0.1.0] - 2026-03-31 — First Release
 

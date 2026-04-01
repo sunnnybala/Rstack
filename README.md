@@ -61,7 +61,7 @@ Every phase transition is a human checkpoint. You approve the literature review 
 
 ## How it Works
 
-Each skill is a SKILL.md file that Claude Code reads and follows. No backend, no database, no custom agents. State persists in `.rstack/` JSONL files in your project directory.
+Each skill is a SKILL.md file that Claude Code reads and follows. No backend, no database, no custom agents. Work products live at your project root as normal files. Structured logs persist in `.rstack/`.
 
 Cloud compute happens through Modal CLI commands that Claude runs directly, same pattern as GStack running `git push` or `gh pr create`.
 
