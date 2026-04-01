@@ -55,7 +55,7 @@ When a user types `/lit-review`, Claude reads `lit-review/SKILL.md` and follows 
 
 **Follow GStack patterns.** RStack is modeled on GStack's architecture. If you're unsure how to structure something, check how GStack does it in the `gstack/` reference directory.
 
-**State files go in `.rstack/`.** Skills read and write to the project-local `.rstack/` directory. Use JSONL for structured data (one record per line, versioned with `"v": 1`). Use Markdown for human-readable outputs.
+**Work products go at the project root.** Skills write user-facing outputs (idea.md, paper.tex, figures) as normal visible files at the git root. Structured JSONL logs (lit-review.jsonl, experiments.jsonl) go in the hidden `.rstack/` plumbing directory. Use JSONL for structured data (one record per line, versioned with `"v": 1`). Use Markdown for human-readable outputs.
 
 **Config goes in `~/.rstack/config.yaml`.** Use `bin/rstack-config get/set` to read/write. Flat keys only. Never store credentials in config, those stay in native CLI auth stores.
 

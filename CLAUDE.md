@@ -73,22 +73,31 @@ When the user's request matches a research skill, invoke it:
 
 ## State files
 
-All research state goes in `.rstack/` in the project directory:
+Work products go at the project root. Internal plumbing goes in `.rstack/`.
+
+### Work products (project root)
 
 | File | Written by | Format |
 |------|-----------|--------|
 | `idea.md` | user or /research | Markdown |
-| `lit-review.jsonl` | /lit-review | JSONL (versioned, `"v":1`) |
 | `lit-review.md` | /lit-review | Markdown |
 | `refined-idea.md` | /novelty-check | Markdown |
 | `novelty-assessment.md` | /novelty-check | Markdown |
 | `experiment-plan.md` | /experiment | Markdown |
-| `experiments.jsonl` | /experiment | JSONL (versioned, append-only) |
+| `train.py` | /experiment | Python |
+| `requirements.txt` | /experiment | Text |
 | `results/run-NNN/` | /experiment | Mixed (metrics.json, figures/, logs) |
 | `analysis/` | /analyze-results | PNG, PDF, .tex, .json |
 | `paper.tex` | /write-paper | LaTeX |
 | `paper.bib` | /write-paper | BibTeX |
 | `paper.pdf` | /write-paper | PDF |
+
+### Plumbing (.rstack/)
+
+| File | Written by | Format |
+|------|-----------|--------|
+| `lit-review.jsonl` | /lit-review | JSONL (versioned, `"v":1`) |
+| `experiments.jsonl` | /experiment | JSONL (versioned, append-only) |
 
 ## Writing SKILL templates
 

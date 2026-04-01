@@ -24,7 +24,7 @@ Orchestrator chains skills with human checkpoints:
         └── /write-paper   → venue-formatted LaTeX + compile
         │
         ▼
-Output: .rstack/paper.pdf
+Output: paper.pdf
 ```
 
 ## Why SKILL.md files (not a custom backend)
@@ -52,22 +52,25 @@ The only helper scripts are for things bash does better than prose:
 
 ## State management
 
-All research state lives in `.rstack/` in the project directory. No database.
+Work products live at the project root as normal, visible files. Internal plumbing
+(structured JSONL logs) lives in `.rstack/`. No database.
 
 ```
-.rstack/
-├── idea.md                 # Raw research idea (user input)
-├── lit-review.jsonl        # Papers found (structured, append-only)
-├── lit-review.md           # Human-readable literature review
-├── refined-idea.md         # Sharpened hypothesis (from /novelty-check)
-├── novelty-assessment.md   # Novelty analysis
-├── experiment-plan.md      # Experiment design
-├── experiments.jsonl       # Experiment log (append-only, versioned records)
-├── results/run-NNN/        # Raw outputs from cloud (metrics, figures, logs)
-├── analysis/               # Publication-ready figures + tables
-├── paper.tex               # The paper
-├── paper.bib               # Citations
-└── paper.pdf               # Compiled output
+my-project/                     # Git root
+├── idea.md                     # Raw research idea (user input)
+├── lit-review.md               # Human-readable literature review
+├── refined-idea.md             # Sharpened hypothesis
+├── novelty-assessment.md       # Novelty analysis
+├── experiment-plan.md          # Experiment design
+├── train.py                    # Generated experiment code
+├── results/run-NNN/            # Raw outputs from cloud
+├── analysis/                   # Publication-ready figures + tables
+├── paper.tex                   # The paper
+├── paper.bib                   # Citations
+├── paper.pdf                   # Compiled output
+└── .rstack/                    # Plumbing (hidden)
+    ├── lit-review.jsonl        # Papers found (structured, append-only)
+    └── experiments.jsonl       # Experiment log (append-only, versioned)
 ```
 
 JSONL files use versioned records (`"v": 1`) for forward compatibility. Each record is one line, append-only. Skills write incrementally to avoid context bloat.
@@ -76,7 +79,7 @@ JSONL files use versioned records (`"v": 1`) for forward compatibility. Each rec
 
 Adapted from GStack's `setup` script pattern:
 
-1. **Bootstrap** (`./setup`, 30 seconds, offline): creates `~/.rstack/`, symlinks skill directories into `~/.claude/skills/`, writes default config. Creates `.install-complete` marker.
+1. **Bootstrap** (`./setup`, 30 seconds, offline): creates `~/.rstack/` for global state, symlinks skill directories into `~/.claude/skills/`, writes default config. Creates `.install-complete` marker.
 
 2. **Provider setup** (`/setup` skill, interactive): configures Modal auth, installs tectonic, sets venue preference. Creates `.setup-complete` marker. Triggered automatically on first skill invocation if not done.
 
@@ -107,7 +110,7 @@ IDEA → /lit-review → /novelty-check → /experiment → /analyze → /write-
                         (revision loops at every checkpoint)
 ```
 
-Skills discover prior outputs by checking `.rstack/` files. If `/novelty-check` finds `lit-review.jsonl`, it uses it. If not, it runs a lightweight search. Each skill degrades gracefully when upstream outputs are missing.
+Skills discover prior outputs by checking project root files and `.rstack/` plumbing. If `/novelty-check` finds `.rstack/lit-review.jsonl`, it uses it. If not, it runs a lightweight search. Each skill degrades gracefully when upstream outputs are missing.
 
 ## What RStack does NOT do
 

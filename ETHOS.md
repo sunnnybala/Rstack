@@ -23,8 +23,9 @@ than a fabricated positive result. Reviewers catch hallucinated numbers. Always.
 ### 2. Reproducibility by Default
 
 Every experiment run is logged: hypothesis, code diff, metric, cloud job ID, artifacts.
-The `.rstack/` directory IS the lab notebook. Anyone can re-run the experiments, check
-the numbers, verify the claims.
+The project directory IS the lab notebook. Work products are visible files at the root;
+structured logs live in `.rstack/`. Anyone can re-run the experiments, check the numbers,
+verify the claims.
 
 ### 3. Human-in-the-Loop at Decision Points
 

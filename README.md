@@ -68,7 +68,7 @@ Cloud compute happens through Modal CLI commands that Claude runs directly, same
 ### Architecture
 
 - **Pure SKILL.md files** — no Express, no React, no Postgres. Claude Code IS the runtime.
-- **State in `.rstack/`** — JSONL for structured data, Markdown for human-readable outputs.
+- **Work products at project root** — visible files (paper.tex, figures, idea.md). JSONL plumbing in `.rstack/`.
 - **Modal for cloud compute** — Claude runs `modal run train.py` directly. No wrappers.
 - **Two-phase install** — offline bootstrap (`./setup`) + interactive auth (`/setup` skill).
 - **Credentials in native stores** — Modal auth stays in `~/.modal.toml`. Never in RStack config.
@@ -84,25 +84,33 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the full design rationale.
 
 ## Project State
 
-All research state lives in `.rstack/` in your project directory:
+Work products live at the project root as normal, visible files. Internal plumbing
+(structured JSONL logs) lives in `.rstack/`.
 
 ```
-.rstack/
-├── idea.md                 # Your research idea
-├── lit-review.jsonl        # Papers found (structured JSONL records)
-├── lit-review.md           # Human-readable literature review
-├── refined-idea.md         # Sharpened hypothesis (from /novelty-check)
-├── novelty-assessment.md   # Novelty analysis with score
-├── experiment-plan.md      # Experiment design document
-├── experiments.jsonl       # Experiment log (append-only)
-├── results/run-001/        # Raw outputs from cloud (metrics, figures, logs)
-├── analysis/               # Publication-ready figures + tables
-│   ├── figures/            # PNG + PDF
-│   ├── tables/             # LaTeX source
-│   └── stats.json          # Statistical summary
-├── paper.tex               # The paper
-├── paper.bib               # BibTeX citations
-└── paper.pdf               # Compiled paper
+my-project/                     # Git root
+├── idea.md                     # Your research idea
+├── lit-review.md               # Human-readable literature review
+├── refined-idea.md             # Sharpened hypothesis (from /novelty-check)
+├── novelty-assessment.md       # Novelty analysis with score
+├── experiment-plan.md          # Experiment design document
+├── train.py                    # Generated experiment code
+├── requirements.txt            # Experiment dependencies
+├── results/                    # Raw outputs from cloud
+│   └── run-001/
+│       ├── metrics.json
+│       ├── stdout.log
+│       └── figures/
+├── analysis/                   # Publication-ready figures + tables
+│   ├── figures/                # PNG + PDF
+│   ├── tables/                 # LaTeX source
+│   └── stats.json              # Statistical summary
+├── paper.tex                   # The paper
+├── paper.bib                   # BibTeX citations
+├── paper.pdf                   # Compiled paper
+└── .rstack/                    # Internal plumbing (hidden)
+    ├── lit-review.jsonl        # Structured paper records
+    └── experiments.jsonl       # Append-only experiment log
 ```
 
 ## Configuration

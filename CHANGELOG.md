@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.1] - 2026-04-01 — File Storage Refactor
+
+### Changed
+
+- **Work products now live at the project root** as normal, visible files (idea.md, paper.tex, analysis/, results/, etc.) instead of being hidden inside `.rstack/`.
+- **`.rstack/` now only holds plumbing** — structured JSONL logs (lit-review.jsonl, experiments.jsonl).
+- **All preambles resolve the git root** via `git rev-parse --show-toplevel`, fixing a bug where files could land in the wrong directory if Claude's CWD wasn't the project root.
+- Updated all 7 SKILL.md files, shared references, templates, and documentation.
+
 ## [0.1.0] - 2026-03-31 — First Release
 
 RStack is here. Type `/research` and go from idea to submittable paper. Each skill works standalone or chains together.
@@ -30,7 +39,7 @@ RStack is here. Type `/research` and go from idea to submittable paper. Each ski
 ### Architecture decisions
 
 - Pure SKILL.md files on Claude Code. No backend, no database, no compiled binaries.
-- State in `.rstack/` JSONL files (versioned records, append-only).
+- Work products at project root, plumbing in `.rstack/` JSONL files (versioned records, append-only).
 - Cloud compute via Modal CLI directly (Claude runs commands, same as GStack with git).
 - Two-phase install: offline bootstrap (`./setup`) + interactive provider auth (`/setup` skill).
 - Credentials in native CLI auth stores, not RStack config.
