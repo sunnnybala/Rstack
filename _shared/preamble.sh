@@ -5,8 +5,14 @@
 # When updating, copy the changes to each SKILL.md's preamble block.
 # A template generation system (like GStack's gen-skill-docs) can automate this in v1.1.
 
+# Resolve project root (fixes CWD problem — always writes to git root, not CWD)
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+if ! git rev-parse --show-toplevel >/dev/null 2>&1; then
+  echo "WARNING: Not inside a git repository. Files will be written to $(pwd)."
+fi
+
 # Session tracking
-mkdir -p ~/.rstack/sessions ~/.rstack/analytics
+mkdir -p ~/.rstack/sessions ~/.rstack/analytics "$_PROJECT_ROOT/.rstack"
 touch ~/.rstack/sessions/"$PPID"
 find ~/.rstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
 
@@ -24,6 +30,7 @@ _TEL=$("$_RSTACK_CONFIG" get telemetry 2>/dev/null || echo "off")
 
 # Branch detection
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
+echo "PROJECT_ROOT: $_PROJECT_ROOT"
 echo "BRANCH: $_BRANCH"
 echo "VENUE: $_VENUE"
 echo "COMPUTE: $_COMPUTE"

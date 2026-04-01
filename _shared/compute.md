@@ -14,10 +14,10 @@ If this fails, tell user: "Modal not authenticated. Run `! modal token new` to l
 ## Running an Experiment
 
 Modal's `modal run` command blocks until the experiment completes and streams stdout/stderr.
-No async polling needed.
+No async polling needed. All paths below are relative to the project root (`$_PROJECT_ROOT`).
 
 ```bash
-modal run train.py 2>&1 | tee .rstack/results/run-NNN/stdout.log
+cd "$_PROJECT_ROOT" && modal run train.py 2>&1 | tee results/run-NNN/stdout.log
 ```
 
 For GPU selection, the experiment code should include a Modal decorator:
@@ -44,7 +44,7 @@ ALL experiment code MUST write outputs to `/output/` on the Modal container:
 After `modal run` completes, download artifacts:
 ```bash
 # Modal volumes (if using persistent storage)
-modal volume get rstack-output /output/ .rstack/results/run-NNN/
+modal volume get rstack-output /output/ results/run-NNN/
 
 # Or if outputs are printed to stdout, parse them from the log
 ```
