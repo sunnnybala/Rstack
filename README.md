@@ -15,6 +15,7 @@ A PhD student with a deadline spends 70% of their time on grunt work: finding pa
 | `/analyze-results` | Publication-ready figures, tables, statistics | "Make figures", "analyze results" |
 | `/write-paper` | Venue-formatted LaTeX with real results and citations | "Write the paper", "format for arXiv" |
 | `/setup` | Configure Modal, tectonic, venue preferences | First-time setup |
+| `/rstack-upgrade` | Upgrade to latest version | "Upgrade rstack" |
 
 ## Install (30 seconds)
 

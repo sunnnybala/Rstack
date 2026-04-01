@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.3] - 2026-04-01 — Auto-Update Check
+
+### Added
+
+- **Auto-update notifications.** Every skill preamble now checks for new RStack versions (cached, 60-minute TTL). When an update is available, offers to upgrade with 4 options: upgrade now, always auto-upgrade, snooze (24h/48h/7d escalation), or disable checks.
+- **`/rstack-upgrade` skill** for standalone upgrade management.
+- **`bin/rstack-update-check`** script with cache, snooze, and version validation.
+- **Config keys:** `update_check` (default true) and `auto_upgrade` (default false).
+
 ## [0.1.2] - 2026-04-01 — Multi-File Experiments
 
 ### Changed

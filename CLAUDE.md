@@ -124,3 +124,5 @@ Rules (same as GStack):
 | `modal_authenticated` | (set by /setup) | /setup status tracking |
 | `modal_default_gpu` | `A100` | /experiment cloud submission |
 | `latex_compiler` | `tectonic` | /write-paper compilation |
+| `update_check` | `true` | preamble (disable version check notifications) |
+| `auto_upgrade` | `false` | rstack-upgrade (auto-upgrade on session start) |
