@@ -20,16 +20,11 @@ allowed-tools:
 ## Preamble (run first)
 
 ```bash
-# Detect rstack root
-_RSTACK_ROOT=""
-if [ -d ".rstack" ]; then
-  _RSTACK_ROOT="$(pwd)"
-elif [ -d "../.rstack" ]; then
-  _RSTACK_ROOT="$(cd .. && pwd)"
-fi
-echo "RSTACK_ROOT: ${_RSTACK_ROOT:-NOT_FOUND}"
+# Resolve project root
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+mkdir -p "$_PROJECT_ROOT/.rstack"
 
-# Detect available state files
+# Detect available state files (work products at root, plumbing in .rstack/)
 _HAS_IDEA="no"
 _HAS_REFINED="no"
 _HAS_LIT_REVIEW="no"
@@ -37,32 +32,33 @@ _HAS_LIT_REVIEW_MD="no"
 _HAS_NOVELTY="no"
 _HAS_EXPERIMENTS="no"
 _HAS_ANALYSIS="no"
-_HAS_CONFIG="no"
 _HAS_FIGURES="no"
 
-if [ -n "$_RSTACK_ROOT" ]; then
-  [ -f "$_RSTACK_ROOT/.rstack/idea.md" ] && _HAS_IDEA="yes"
-  [ -f "$_RSTACK_ROOT/.rstack/refined-idea.md" ] && _HAS_REFINED="yes"
-  [ -f "$_RSTACK_ROOT/.rstack/lit-review.jsonl" ] && _HAS_LIT_REVIEW="yes"
-  [ -f "$_RSTACK_ROOT/.rstack/lit-review.md" ] && _HAS_LIT_REVIEW_MD="yes"
-  [ -f "$_RSTACK_ROOT/.rstack/novelty-assessment.md" ] && _HAS_NOVELTY="yes"
-  [ -f "$_RSTACK_ROOT/.rstack/experiments.jsonl" ] && _HAS_EXPERIMENTS="yes"
-  [ -d "$_RSTACK_ROOT/.rstack/analysis" ] && _HAS_ANALYSIS="yes"
-  [ -f "$_RSTACK_ROOT/.rstack/config.yaml" ] && _HAS_CONFIG="yes"
-  _FIG_COUNT=0
-  if [ -d "$_RSTACK_ROOT/.rstack/analysis/figures" ]; then
-    _HAS_FIGURES="yes"
-    _FIG_COUNT=$(find "$_RSTACK_ROOT/.rstack/analysis/figures" -type f \( -name "*.png" -o -name "*.pdf" -o -name "*.svg" \) 2>/dev/null | wc -l | tr -d ' ')
-  fi
+# Work products at project root
+[ -f "$_PROJECT_ROOT/idea.md" ] && _HAS_IDEA="yes"
+[ -f "$_PROJECT_ROOT/refined-idea.md" ] && _HAS_REFINED="yes"
+[ -f "$_PROJECT_ROOT/lit-review.md" ] && _HAS_LIT_REVIEW_MD="yes"
+[ -f "$_PROJECT_ROOT/novelty-assessment.md" ] && _HAS_NOVELTY="yes"
+[ -d "$_PROJECT_ROOT/analysis" ] && _HAS_ANALYSIS="yes"
+
+# Plumbing in .rstack/
+[ -f "$_PROJECT_ROOT/.rstack/lit-review.jsonl" ] && _HAS_LIT_REVIEW="yes"
+[ -f "$_PROJECT_ROOT/.rstack/experiments.jsonl" ] && _HAS_EXPERIMENTS="yes"
+
+_FIG_COUNT=0
+if [ -d "$_PROJECT_ROOT/analysis/figures" ]; then
+  _HAS_FIGURES="yes"
+  _FIG_COUNT=$(find "$_PROJECT_ROOT/analysis/figures" -type f \( -name "*.png" -o -name "*.pdf" -o -name "*.svg" \) 2>/dev/null | wc -l | tr -d ' ')
 fi
 
+echo "PROJECT_ROOT: $_PROJECT_ROOT"
 echo "STATE: idea=$_HAS_IDEA refined=$_HAS_REFINED lit-review=$_HAS_LIT_REVIEW lit-review-md=$_HAS_LIT_REVIEW_MD"
 echo "STATE: novelty=$_HAS_NOVELTY experiments=$_HAS_EXPERIMENTS analysis=$_HAS_ANALYSIS"
-echo "STATE: config=$_HAS_CONFIG figures=$_HAS_FIGURES (count=$_FIG_COUNT)"
+echo "STATE: figures=$_HAS_FIGURES (count=$_FIG_COUNT)"
 
 # Count experiment runs if available
 if [ "$_HAS_EXPERIMENTS" = "yes" ]; then
-  _EXP_COUNT=$(wc -l < "$_RSTACK_ROOT/.rstack/experiments.jsonl" 2>/dev/null | tr -d ' ')
+  _EXP_COUNT=$(wc -l < "$_PROJECT_ROOT/.rstack/experiments.jsonl" 2>/dev/null | tr -d ' ')
   echo "EXPERIMENTS: $_EXP_COUNT runs logged"
 fi
 
@@ -89,9 +85,7 @@ echo "BRANCH: $(git branch --show-current 2>/dev/null || echo 'unknown')"
 
 After the preamble runs, note the state and proceed.
 
-If `RSTACK_ROOT` is `NOT_FOUND`: tell the user "No .rstack/ directory found. Are you
-in the right project directory?" and use AskUserQuestion to confirm. If the user wants
-to proceed anyway, create `.rstack/` and continue in standalone mode.
+**Important:** Note the `PROJECT_ROOT` value from the preamble output. All file paths below are relative to this project root directory. Work products (idea.md, paper.tex, analysis/) are at the project root. Plumbing (.rstack/lit-review.jsonl, .rstack/experiments.jsonl) is in the `.rstack/` subdirectory.
 
 If `LATEX_COMPILER` is `none`: warn the user that no LaTeX compiler is installed.
 Paper will be written but not compiled. Suggest: "Run /setup to install tectonic,
@@ -110,9 +104,9 @@ These are non-negotiable. Violating any of these is worse than not writing the p
 1. **NEVER hallucinate results.** Every number in the paper must come from
    `.rstack/experiments.jsonl`. If a metric is not in the logs, do not write it.
 2. **NEVER invent citations.** Every `\cite{key}` must reference a real entry in
-   `paper.bib` generated from `lit-review.jsonl`. No phantom references.
+   `paper.bib` generated from `.rstack/lit-review.jsonl`. No phantom references.
 3. **NEVER fabricate figures.** Every `\includegraphics{path}` must point to a real
-   file in `.rstack/analysis/figures/`. If the file does not exist, skip it and
+   file in `analysis/figures/`. If the file does not exist, skip it and
    write `% [Figure pending: description]` as a comment.
 4. **Say what's real.** If results are negative or inconclusive, write them honestly.
    Reviewers catch fabricated positive results. Always.
@@ -121,17 +115,17 @@ These are non-negotiable. Violating any of these is worse than not writing the p
 
 ## Step 0: Gather Context
 
-Read all available `.rstack/` state files. The preamble already detected what exists.
+Read all available state files. The preamble already detected what exists.
 Read each available file in order:
 
-1. `.rstack/idea.md` -- the original research idea
-2. `.rstack/refined-idea.md` -- sharpened hypothesis (from /novelty-check)
-3. `.rstack/lit-review.jsonl` -- structured paper records
-4. `.rstack/lit-review.md` -- human-readable literature review
-5. `.rstack/novelty-assessment.md` -- novelty analysis
-6. `.rstack/experiments.jsonl` -- experiment log with metrics
-7. `.rstack/analysis/` directory -- any analysis outputs, tables, summaries
-8. `.rstack/analysis/figures/` -- publication-ready figures (list all files)
+1. `idea.md` -- the original research idea (project root)
+2. `refined-idea.md` -- sharpened hypothesis (project root)
+3. `.rstack/lit-review.jsonl` -- structured paper records (plumbing)
+4. `lit-review.md` -- human-readable literature review (project root)
+5. `novelty-assessment.md` -- novelty analysis (project root)
+6. `.rstack/experiments.jsonl` -- experiment log with metrics (plumbing)
+7. `analysis/` directory -- any analysis outputs, tables, summaries (project root)
+8. `analysis/figures/` -- publication-ready figures (project root, list all files)
 
 For each file that exists, read it. For each file that does not exist, note it and
 move on. The paper will be written with whatever is available.
@@ -142,7 +136,7 @@ move on. The paper will be written with whatever is available.
 
 If experiments.jsonl is missing, use AskUserQuestion:
 
-> No experiment results found in `.rstack/experiments.jsonl`.
+> No experiment results found in `.rstack/experiments.jsonl` (plumbing).
 >
 > Options:
 > A) Provide results manually (paste metrics or point to a file)
@@ -162,15 +156,11 @@ Take the user's response and use it as the idea context for the rest of the work
 
 ## Step 1: Venue Selection
 
-Check `.rstack/config.yaml` for a `venue` field. If the file exists, read it and
-extract the venue. If no config or no venue field, default to `arxiv`.
+Check venue configuration. Use `rstack-config get venue` or default to `arxiv`.
 
 ```bash
-if [ -f ".rstack/config.yaml" ]; then
-  grep -i "venue:" .rstack/config.yaml 2>/dev/null || echo "venue: arxiv"
-else
-  echo "venue: arxiv"
-fi
+_RSTACK_CONFIG="$HOME/.claude/skills/rstack/bin/rstack-config"
+"$_RSTACK_CONFIG" get venue 2>/dev/null || echo "venue: arxiv"
 ```
 
 Read the formatting rules from `_shared/venues.md` if the file exists in the skill
@@ -197,7 +187,7 @@ Always use the arXiv template regardless of selection in v0.1.
 
 ## Step 2: Generate BibTeX
 
-If `lit-review.jsonl` exists, read it and generate BibTeX entries.
+If `.rstack/lit-review.jsonl` exists, read it and generate BibTeX entries.
 
 For each paper record in the JSONL file, generate a BibTeX entry:
 - Cite key format: `{firstauthorlastname}{year}` (lowercase, no spaces)
@@ -207,14 +197,14 @@ For each paper record in the JSONL file, generate a BibTeX entry:
   `@misc` for arXiv preprints
 - Fields: author, title, year, journal/booktitle, url (if available)
 
-Write the complete BibTeX file to `.rstack/paper.bib`.
+Write the complete BibTeX file to `paper.bib` at the project root.
 
 ```bash
-# Verify the bib file was written
-wc -l .rstack/paper.bib 2>/dev/null || echo "paper.bib not yet created"
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+wc -l "$_PROJECT_ROOT/paper.bib" 2>/dev/null || echo "paper.bib not yet created"
 ```
 
-If `lit-review.jsonl` does not exist, use AskUserQuestion:
+If `.rstack/lit-review.jsonl` does not exist, use AskUserQuestion:
 
 > No literature review found (`.rstack/lit-review.jsonl` missing).
 >
@@ -223,7 +213,7 @@ If `lit-review.jsonl` does not exist, use AskUserQuestion:
 > B) Run /lit-review first to find relevant papers
 > C) Proceed without citations (Related Work section will be thin)
 
-If the user provides references manually, parse them and write `paper.bib`.
+If the user provides references manually, parse them and write `paper.bib` at the project root.
 If they pick C, create an empty `paper.bib` and note that Related Work will
 need references added later.
 
@@ -256,7 +246,7 @@ Generate a bullet-point outline for each section:
 ### 3c. Figure Plan
 
 List which figures go in which section, with descriptions:
-- Match against actual files in `.rstack/analysis/figures/`
+- Match against actual files in `analysis/figures/`
 - If figures exist: map each to its appropriate section
 - If no figures: note which figures SHOULD exist and where they would go
 
@@ -317,8 +307,8 @@ Write the complete LaTeX document from `\documentclass` through `\end{document}`
 - Use REAL citation keys from `paper.bib` with `\cite{key}`. Cross-check every
   `\cite{}` against the bib file. If a key does not exist in paper.bib, do not
   use it.
-- Use REAL figure paths from `.rstack/analysis/figures/`. Use
-  `\includegraphics{.rstack/analysis/figures/filename}` with actual filenames.
+- Use REAL figure paths from `analysis/figures/`. Use
+  `\includegraphics{analysis/figures/filename}` with actual filenames.
   If a figure file does not exist, write a comment instead:
   `% [Figure pending: {description of what should go here}]`
 - Use REAL metrics from `.rstack/experiments.jsonl`. Extract actual numbers
@@ -358,7 +348,7 @@ Use AskUserQuestion: "Review introduction? A) Continue B) Revise"
 
 **Section 3: Related Work**
 
-Write Related Work from `lit-review.md`. Group papers by theme, not chronologically.
+Write Related Work from `lit-review.md` (at the project root). Group papers by theme, not chronologically.
 For each group: summarize the approach, note limitations, explain how this work
 differs or builds upon it. Cite papers using keys from `paper.bib`.
 
@@ -412,10 +402,11 @@ Use AskUserQuestion: "Review conclusion? A) Continue B) Revise"
 
 ### 4d. Save
 
-Write the complete LaTeX document to `.rstack/paper.tex`.
+Write the complete LaTeX document to `paper.tex` at the project root.
 
 ```bash
-wc -l .rstack/paper.tex 2>/dev/null && echo "paper.tex saved"
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+wc -l "$_PROJECT_ROOT/paper.tex" 2>/dev/null && echo "paper.tex saved"
 ```
 
 ---
@@ -430,12 +421,14 @@ Based on the detected compiler from the preamble:
 
 If `tectonic` is available:
 ```bash
-cd .rstack && tectonic paper.tex 2>&1
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+cd "$_PROJECT_ROOT" && tectonic paper.tex 2>&1
 ```
 
 If `pdflatex` is available (fallback):
 ```bash
-cd .rstack && pdflatex -interaction=nonstopmode paper.tex 2>&1 && bibtex paper 2>&1 && pdflatex -interaction=nonstopmode paper.tex 2>&1 && pdflatex -interaction=nonstopmode paper.tex 2>&1
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+cd "$_PROJECT_ROOT" && pdflatex -interaction=nonstopmode paper.tex 2>&1 && bibtex paper 2>&1 && pdflatex -interaction=nonstopmode paper.tex 2>&1 && pdflatex -interaction=nonstopmode paper.tex 2>&1
 ```
 
 If neither is available:
@@ -450,8 +443,8 @@ If compilation fails, read the error output and attempt auto-fixes:
 1. **Missing packages:** Add `\usepackage{package}` to the preamble and retry.
 2. **Undefined references:** Run compilation again (references need two passes).
 3. **Missing figures:** Comment out the `\includegraphics` line and add a
-   `% [Figure missing: path]` comment.
-4. **BibTeX errors:** Check for malformed entries in paper.bib, fix and retry.
+   `% [Figure missing: path]` comment. Figures should be at `analysis/figures/`.
+4. **BibTeX errors:** Check for malformed entries in `paper.bib`, fix and retry.
 5. **Encoding issues:** Ensure UTF-8, escape special LaTeX characters.
 
 Retry up to 3 times. After each retry, show what was fixed.
@@ -468,10 +461,11 @@ If still failing after 3 attempts, show the error and use AskUserQuestion:
 
 ### 5c. Output
 
-If compilation succeeds, the output is `.rstack/paper.pdf`.
+If compilation succeeds, the output is `paper.pdf` at the project root.
 
 ```bash
-ls -la .rstack/paper.pdf 2>/dev/null && echo "PDF generated successfully"
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+ls -la "$_PROJECT_ROOT/paper.pdf" 2>/dev/null && echo "PDF generated successfully"
 ```
 
 ---
@@ -481,18 +475,18 @@ ls -la .rstack/paper.pdf 2>/dev/null && echo "PDF generated successfully"
 Show paper statistics:
 
 ```bash
-if [ -f ".rstack/paper.tex" ]; then
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+if [ -f "$_PROJECT_ROOT/paper.tex" ]; then
   echo "=== Paper Statistics ==="
-  echo "Lines: $(wc -l < .rstack/paper.tex)"
-  echo "Citations: $(grep -o '\\\\cite{[^}]*}' .rstack/paper.tex 2>/dev/null | wc -l | tr -d ' ')"
-  echo "Figures: $(grep -o '\\\\includegraphics' .rstack/paper.tex 2>/dev/null | wc -l | tr -d ' ')"
-  echo "Tables: $(grep -o '\\\\begin{table' .rstack/paper.tex 2>/dev/null | wc -l | tr -d ' ')"
-  echo "Sections: $(grep -o '\\\\section{' .rstack/paper.tex 2>/dev/null | wc -l | tr -d ' ')"
-  # Rough word count (strip LaTeX commands)
-  echo "Word count (approx): $(sed 's/\\\\[a-zA-Z]*{[^}]*}//g; s/\\\\[a-zA-Z]*//g; s/[{}]//g' .rstack/paper.tex 2>/dev/null | wc -w | tr -d ' ')"
+  echo "Lines: $(wc -l < "$_PROJECT_ROOT/paper.tex")"
+  echo "Citations: $(grep -o '\\\\cite{[^}]*}' "$_PROJECT_ROOT/paper.tex" 2>/dev/null | wc -l | tr -d ' ')"
+  echo "Figures: $(grep -o '\\\\includegraphics' "$_PROJECT_ROOT/paper.tex" 2>/dev/null | wc -l | tr -d ' ')"
+  echo "Tables: $(grep -o '\\\\begin{table' "$_PROJECT_ROOT/paper.tex" 2>/dev/null | wc -l | tr -d ' ')"
+  echo "Sections: $(grep -o '\\\\section{' "$_PROJECT_ROOT/paper.tex" 2>/dev/null | wc -l | tr -d ' ')"
+  echo "Word count (approx): $(sed 's/\\\\[a-zA-Z]*{[^}]*}//g; s/\\\\[a-zA-Z]*//g; s/[{}]//g' "$_PROJECT_ROOT/paper.tex" 2>/dev/null | wc -w | tr -d ' ')"
 fi
-if [ -f ".rstack/paper.pdf" ]; then
-  echo "PDF: .rstack/paper.pdf ($(du -h .rstack/paper.pdf | cut -f1))"
+if [ -f "$_PROJECT_ROOT/paper.pdf" ]; then
+  echo "PDF: paper.pdf ($(du -h "$_PROJECT_ROOT/paper.pdf" | cut -f1))"
 else
   echo "PDF: not compiled"
 fi
@@ -505,9 +499,9 @@ Present the summary to the user via AskUserQuestion:
 > {statistics from above}
 >
 > Files written:
-> - `.rstack/paper.tex` -- LaTeX source
-> - `.rstack/paper.bib` -- BibTeX references
-> - `.rstack/paper.pdf` -- compiled PDF (if compiled)
+> - `paper.tex` -- LaTeX source
+> - `paper.bib` -- BibTeX references
+> - `paper.pdf` -- compiled PDF (if compiled)
 >
 > Options:
 > A) Done -- looks good
@@ -520,15 +514,15 @@ If they pick C, re-run Step 5.
 If they pick D:
 
 ```bash
-# Try to open the PDF in the default viewer
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 if command -v xdg-open >/dev/null 2>&1; then
-  xdg-open .rstack/paper.pdf
+  xdg-open "$_PROJECT_ROOT/paper.pdf"
 elif command -v open >/dev/null 2>&1; then
-  open .rstack/paper.pdf
+  open "$_PROJECT_ROOT/paper.pdf"
 elif command -v start >/dev/null 2>&1; then
-  start .rstack/paper.pdf
+  start "$_PROJECT_ROOT/paper.pdf"
 else
-  echo "Cannot auto-open. PDF is at: .rstack/paper.pdf"
+  echo "Cannot auto-open. PDF is at: paper.pdf"
 fi
 ```
 
@@ -536,13 +530,13 @@ fi
 
 ## Standalone Mode
 
-If invoked outside of the full rstack pipeline (no .rstack/ directory, no prior
-skill outputs), the skill still works:
+If invoked outside of the full rstack pipeline (no prior skill outputs), the skill
+still works:
 
 1. Ask the user what the paper is about (replaces idea.md)
 2. Ask for references (replaces lit-review)
 3. Ask for results (replaces experiments.jsonl)
-4. Create `.rstack/` directory and write state files from user input
+4. Create `.rstack/` directory for plumbing and write work products to the project root
 5. Proceed through Steps 1-6 normally
 
 This allows `/write-paper` to be useful even without running `/lit-review` or
@@ -555,7 +549,7 @@ This allows `/write-paper` to be useful even without running `/lit-review` or
 - If any Read fails on a state file, skip it and note what's missing.
 - If AskUserQuestion is not available, proceed with defaults and note decisions.
 - If compilation fails and cannot be fixed, the .tex file is still the deliverable.
-- If the user aborts mid-workflow, whatever has been written to `.rstack/` persists
+- If the user aborts mid-workflow, whatever has been written to the project directory persists
   for the next run.
 
 ## Completion Status

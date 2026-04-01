@@ -21,13 +21,15 @@ allowed-tools:
 ## Preamble (run first)
 
 ```bash
-mkdir -p ~/.rstack/sessions ~/.rstack/analytics .rstack/results
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+mkdir -p ~/.rstack/sessions ~/.rstack/analytics "$_PROJECT_ROOT/.rstack" "$_PROJECT_ROOT/results"
 touch ~/.rstack/sessions/"$PPID"
 find ~/.rstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
 _RSTACK_CONFIG="$(dirname "$(dirname "$0")")/bin/rstack-config"
 _COMPUTE=$("$_RSTACK_CONFIG" get compute_preferred 2>/dev/null || echo "modal")
 _CHECKPOINT=$("$_RSTACK_CONFIG" get experiment_checkpoint 2>/dev/null || echo "3")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
+echo "PROJECT_ROOT: $_PROJECT_ROOT"
 echo "BRANCH: $_BRANCH"
 echo "COMPUTE: $_COMPUTE"
 echo "CHECKPOINT_INTERVAL: $_CHECKPOINT"
@@ -39,6 +41,8 @@ echo '{"skill":"experiment","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> ~/.rsta
 
 If output shows `NEEDS_SETUP`: tell user "Modal not configured. Running /setup first..."
 Read `setup-skill/SKILL.md` and follow it inline.
+
+**Important:** Note the `PROJECT_ROOT` value from the preamble output. All file paths below are relative to this project root directory. Work products (idea.md, experiment-plan.md, results/, train.py) go at the project root. Plumbing (.rstack/experiments.jsonl) goes in the `.rstack/` subdirectory.
 
 ---
 
@@ -60,13 +64,13 @@ modal token info >/dev/null 2>&1 && echo "MODAL_AUTH_OK" || echo "MODAL_AUTH_FAI
 ## Step 1: Understand the Research Goal
 
 Read context in this priority order:
-1. `.rstack/refined-idea.md` (best — from /novelty-check, has sharp hypothesis)
-2. `.rstack/idea.md` (good — raw idea)
+1. `refined-idea.md` (best — from /novelty-check, has sharp hypothesis)
+2. `idea.md` (good — raw idea)
 3. Ask user directly (if neither file exists)
 
 Also read if available:
-- `.rstack/novelty-assessment.md` — tells us what baselines to compare against
-- `.rstack/experiment-plan.md` — previous plan from a prior run
+- `novelty-assessment.md` — tells us what baselines to compare against
+- `experiment-plan.md` — previous plan from a prior run
 - `.rstack/experiments.jsonl` — prior experiment results (we're continuing)
 
 ---
@@ -78,7 +82,7 @@ Design the experiment before writing any code. Use WebSearch to find:
 - Standard baselines to compare against
 - Common evaluation metrics for this task
 
-Write an experiment plan to `.rstack/experiment-plan.md`:
+Write an experiment plan to `experiment-plan.md` at the project root:
 
 ```markdown
 # Experiment Plan
@@ -240,17 +244,19 @@ If the user has previously said "auto" or is in `--auto` mode, skip this confirm
 Run the experiment on Modal. Claude runs the command directly (same as GStack runs `git push`):
 
 ```bash
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 # Determine run ID
-RUN_NUM=$(wc -l < .rstack/experiments.jsonl 2>/dev/null | tr -d ' ' || echo "0")
+RUN_NUM=0
+[ -f "$_PROJECT_ROOT/.rstack/experiments.jsonl" ] && RUN_NUM=$(wc -l < "$_PROJECT_ROOT/.rstack/experiments.jsonl" | tr -d ' ')
 RUN_NUM=$((RUN_NUM + 1))
 RUN_ID=$(printf "run-%03d" $RUN_NUM)
-mkdir -p ".rstack/results/$RUN_ID"
+mkdir -p "$_PROJECT_ROOT/results/$RUN_ID"
 
 # Execute on Modal (blocks until complete)
-modal run train.py 2>&1 | tee ".rstack/results/$RUN_ID/stdout.log"
+cd "$_PROJECT_ROOT" && modal run train.py 2>&1 | tee "$_PROJECT_ROOT/results/$RUN_ID/stdout.log"
 ```
 
-After completion, download artifacts from Modal to `.rstack/results/$RUN_ID/`.
+After completion, download artifacts from Modal to `results/$RUN_ID/`.
 
 **Error handling** (from Ignis run-experiment.ts classifyError):
 
@@ -268,7 +274,7 @@ Max 3 retry attempts per experiment. After each failure, fix the identified issu
 
 ## Step 7: Log Results
 
-Extract metrics from the run output and `.rstack/results/$RUN_ID/metrics.json`.
+Extract metrics from the run output and `results/$RUN_ID/metrics.json`.
 
 Append a record to `.rstack/experiments.jsonl`:
 
@@ -306,7 +312,7 @@ Compare this run's metric against the previous best (if any prior runs exist).
 > D) Stop — results are good enough for the paper
 
 If A: suggest the next experiment modification based on what's been tried and what worked. Go back to Step 3.
-If B: ask what new direction, update experiment-plan.md, go back to Step 2.
+If B: ask what new direction, update `experiment-plan.md`, go back to Step 2.
 If C: go back to /novelty-check.
 If D: proceed. Suggest running /analyze-results next.
 
@@ -339,6 +345,6 @@ Then go back to Step 3 with the new hypothesis. Each iteration should try someth
 
 If `/experiment` is invoked without prior /lit-review or /novelty-check:
 - Ask user for the research goal directly
-- Skip reading refined-idea.md (won't exist)
+- Skip reading `refined-idea.md` (won't exist)
 - Proceed from Step 2 (experiment planning)
 - Note: "Running without literature review. Consider /lit-review first for better experiment design."
