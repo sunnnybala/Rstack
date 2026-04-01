@@ -24,6 +24,10 @@ allowed-tools:
 _PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 mkdir -p "$_PROJECT_ROOT/.rstack"
 
+# Update check
+_UPD=$("$HOME/.claude/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
+[ -n "$_UPD" ] && echo "$_UPD" || true
+
 # Detect available state files (work products at root, plumbing in .rstack/)
 _HAS_IDEA="no"
 _HAS_REFINED="no"
@@ -84,6 +88,9 @@ echo "BRANCH: $(git branch --show-current 2>/dev/null || echo 'unknown')"
 ```
 
 After the preamble runs, note the state and proceed.
+
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `rstack-upgrade/SKILL.md` and follow the "Inline Upgrade Flow". Then continue with this skill.
+If output shows `JUST_UPGRADED <from> <to>`: tell user "Running RStack v{to} (just updated!)" and continue.
 
 **Important:** Note the `PROJECT_ROOT` value from the preamble output. All file paths below are relative to this project root directory. Work products (idea.md, paper.tex, analysis/) are at the project root. Plumbing (.rstack/lit-review.jsonl, .rstack/experiments.jsonl) is in the `.rstack/` subdirectory.
 

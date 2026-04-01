@@ -26,6 +26,8 @@ mkdir -p ~/.rstack/sessions ~/.rstack/analytics "$_PROJECT_ROOT/.rstack"
 touch ~/.rstack/sessions/"$PPID"
 find ~/.rstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
 _RSTACK_CONFIG="$(dirname "$(dirname "$0")")/bin/rstack-config"
+_UPD=$("$HOME/.claude/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
+[ -n "$_UPD" ] && echo "$_UPD" || true
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "PROJECT_ROOT: $_PROJECT_ROOT"
 echo "BRANCH: $_BRANCH"
@@ -34,6 +36,9 @@ if [ ! -f ~/.rstack/.setup-complete ]; then
 fi
 echo '{"skill":"lit-review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> ~/.rstack/analytics/skill-usage.jsonl 2>/dev/null || true
 ```
+
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `rstack-upgrade/SKILL.md` and follow the "Inline Upgrade Flow". Then continue with this skill.
+If output shows `JUST_UPGRADED <from> <to>`: tell user "Running RStack v{to} (just updated!)" and continue.
 
 If output shows `NEEDS_SETUP`: tell user "RStack not configured yet. Run `/setup` first."
 Then read `setup-skill/SKILL.md` and follow it inline before continuing.

@@ -19,9 +19,14 @@ allowed-tools:
 _PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 mkdir -p ~/.rstack/analytics "$_PROJECT_ROOT/.rstack"
 echo '{"skill":"setup","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> ~/.rstack/analytics/skill-usage.jsonl 2>/dev/null || true
+_UPD=$("$HOME/.claude/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
+[ -n "$_UPD" ] && echo "$_UPD" || true
 echo "PROJECT_ROOT: $_PROJECT_ROOT"
 echo "=== RStack Setup ==="
 ```
+
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `rstack-upgrade/SKILL.md` and follow the "Inline Upgrade Flow". Then continue with this skill.
+If output shows `JUST_UPGRADED <from> <to>`: tell user "Running RStack v{to} (just updated!)" and continue.
 
 ## Step 1: Detect Environment
 

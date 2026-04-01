@@ -49,7 +49,7 @@ fi
 
 # ─── Symlink skill directories ───────────────────────────────
 # Each directory with a SKILL.md gets symlinked into ~/.claude/skills/
-SKILL_DIRS="lit-review novelty-check experiment analyze-results write-paper research setup-skill"
+SKILL_DIRS="lit-review novelty-check experiment analyze-results write-paper research setup-skill rstack-upgrade"
 
 echo ""
 echo "Linking skills into $SKILLS_DIR ..."

@@ -23,6 +23,10 @@ _SESSIONS=$(find ~/.rstack/sessions -mmin -120 -type f 2>/dev/null | wc -l | tr 
 _RSTACK_DIR="$(cd "$(dirname "$0")/.." 2>/dev/null && pwd || echo "$HOME/.claude/skills/rstack")"
 _RSTACK_CONFIG="$_RSTACK_DIR/bin/rstack-config"
 
+# Update check (non-blocking, cached)
+_UPD=$("$_RSTACK_DIR/bin/rstack-update-check" 2>/dev/null || true)
+[ -n "$_UPD" ] && echo "$_UPD" || true
+
 _VENUE=$("$_RSTACK_CONFIG" get venue 2>/dev/null || echo "arxiv")
 _COMPUTE=$("$_RSTACK_CONFIG" get compute_preferred 2>/dev/null || echo "modal")
 _PROACTIVE=$("$_RSTACK_CONFIG" get proactive 2>/dev/null || echo "true")
