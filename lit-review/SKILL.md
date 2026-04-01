@@ -21,11 +21,13 @@ allowed-tools:
 ## Preamble (run first)
 
 ```bash
-mkdir -p ~/.rstack/sessions ~/.rstack/analytics .rstack
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+mkdir -p ~/.rstack/sessions ~/.rstack/analytics "$_PROJECT_ROOT/.rstack"
 touch ~/.rstack/sessions/"$PPID"
 find ~/.rstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
 _RSTACK_CONFIG="$(dirname "$(dirname "$0")")/bin/rstack-config"
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
+echo "PROJECT_ROOT: $_PROJECT_ROOT"
 echo "BRANCH: $_BRANCH"
 if [ ! -f ~/.rstack/.setup-complete ]; then
   echo "NEEDS_SETUP"
@@ -36,13 +38,15 @@ echo '{"skill":"lit-review","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> ~/.rsta
 If output shows `NEEDS_SETUP`: tell user "RStack not configured yet. Run `/setup` first."
 Then read `setup-skill/SKILL.md` and follow it inline before continuing.
 
+**Important:** Note the `PROJECT_ROOT` value from the preamble output. All file paths below are relative to this project root directory. When instructions say "write to `idea.md`", write to `{PROJECT_ROOT}/idea.md`. When they say `.rstack/lit-review.jsonl`, write to `{PROJECT_ROOT}/.rstack/lit-review.jsonl`.
+
 ---
 
 ## Step 0: Understand the Research Area
 
-1. Read `.rstack/idea.md` if it exists. This is the research idea to survey.
-2. If `.rstack/idea.md` does not exist, ask the user: "What research area should I survey? Describe your idea or topic."
-3. Save the idea to `.rstack/idea.md` if not already saved.
+1. Read `idea.md` at the project root if it exists. This is the research idea to survey.
+2. If `idea.md` does not exist, ask the user: "What research area should I survey? Describe your idea or topic."
+3. Save the idea to `idea.md` at the project root if not already saved.
 4. Extract 3-5 key concepts from the idea for search.
 
 ---
@@ -89,7 +93,7 @@ curl -s "https://api.semanticscholar.org/graph/v1/paper/search?query=$QUERY&limi
 
 ## Step 3: Assess and Record Each Paper
 
-For each paper found, assess it and write a JSONL record to `.rstack/lit-review.jsonl`.
+For each paper found, assess it and write a JSONL record to `.rstack/lit-review.jsonl` (in the project's `.rstack/` plumbing directory).
 
 **Assessment criteria:**
 - **Relevance** (0-10): How directly does this paper relate to the research idea?
@@ -113,7 +117,7 @@ If a paper lacks some fields (no abstract from S2, missing venue), fill what's a
 
 ## Step 4: Consolidate Literature Review
 
-After all papers are recorded, write a human-readable literature review to `.rstack/lit-review.md`.
+After all papers are recorded, write a human-readable literature review to `lit-review.md` at the project root.
 
 **Structure** (from Ignis consolidate-lit-review-agent pattern):
 
@@ -146,7 +150,7 @@ What should we avoid? What baselines should we compare against?}
 {Numbered list of all papers with title, authors, year, venue, URL}
 ```
 
-**Length:** 800-1500 words. Only cite papers that are actually in `.rstack/lit-review.jsonl`.
+**Length:** 800-1500 words. Only cite papers that are actually in `.rstack/lit-review.jsonl` (plumbing).
 
 **Important:** When writing the consolidation, read from the JSONL file rather than relying on context memory. This ensures accuracy.
 
@@ -165,7 +169,7 @@ Use AskUserQuestion:
 > **Main finding:** {one sentence about the key theme}
 > **Main gap:** {one sentence about what's missing in the literature}
 >
-> Saved to `.rstack/lit-review.jsonl` ({total} records) and `.rstack/lit-review.md`.
+> Saved to `.rstack/lit-review.jsonl` ({total} records) and `lit-review.md`.
 >
 > RECOMMENDATION: Choose A to proceed to novelty assessment.
 
@@ -177,7 +181,7 @@ Options:
 
 If B: generate new search queries focused on the subtopic, repeat Steps 2-4, append new papers to the existing JSONL file, and update the lit-review.md.
 
-If C: update `.rstack/idea.md` with the new direction, then re-run from Step 1.
+If C: update `idea.md` with the new direction, then re-run from Step 1.
 
 ---
 

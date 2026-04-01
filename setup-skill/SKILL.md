@@ -16,8 +16,10 @@ allowed-tools:
 ## Preamble (run first)
 
 ```bash
-mkdir -p ~/.rstack/analytics
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+mkdir -p ~/.rstack/analytics "$_PROJECT_ROOT/.rstack"
 echo '{"skill":"setup","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> ~/.rstack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo "PROJECT_ROOT: $_PROJECT_ROOT"
 echo "=== RStack Setup ==="
 ```
 

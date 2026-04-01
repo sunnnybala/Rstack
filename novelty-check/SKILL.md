@@ -21,13 +21,15 @@ allowed-tools:
 ## Preamble (run first)
 
 ```bash
-mkdir -p ~/.rstack/sessions ~/.rstack/analytics
+_PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+mkdir -p ~/.rstack/sessions ~/.rstack/analytics "$_PROJECT_ROOT/.rstack"
 touch ~/.rstack/sessions/"$PPID"
 find ~/.rstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
 _RSTACK_CONFIG="$(dirname "$(dirname "$0")")/bin/rstack-config"
 _VENUE=$("$_RSTACK_CONFIG" get venue 2>/dev/null || echo "arxiv")
 _COMPUTE=$("$_RSTACK_CONFIG" get compute_preferred 2>/dev/null || echo "modal")
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
+echo "PROJECT_ROOT: $_PROJECT_ROOT"
 echo "BRANCH: $_BRANCH"
 echo "VENUE: $_VENUE"
 if [ ! -f ~/.rstack/.setup-complete ]; then
@@ -38,13 +40,15 @@ echo '{"skill":"novelty-check","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> ~/.r
 
 If output shows `NEEDS_SETUP`: tell user "RStack not configured yet. Run `/setup` to configure compute providers." Then read `setup-skill/SKILL.md` and follow it inline before continuing.
 
+**Important:** Note the `PROJECT_ROOT` value from the preamble output. All file paths below are relative to this project root directory. Work products (idea.md, refined-idea.md, etc.) go at the project root. Plumbing (.rstack/lit-review.jsonl) goes in the `.rstack/` subdirectory.
+
 ## When to Use
 
 Run this after `/lit-review` to assess whether your research idea is novel. Can also run standalone — if no literature review exists, it runs a lightweight search first (top 10 papers only).
 
 ## Step 0: Load Context
 
-1. Read `.rstack/idea.md`. If it does not exist, ask the user for their research idea and save it.
+1. Read `idea.md` at the project root. If it does not exist, ask the user for their research idea and save it.
 2. Check if `.rstack/lit-review.jsonl` exists.
    - If YES: read it. This is the primary source for comparison.
    - If NO: run a lightweight search. Use WebSearch to find the top 10 most relevant papers for this idea. Record them as temporary context. Note: "Running lightweight novelty check without full literature review. Run /lit-review first for higher confidence."
@@ -79,13 +83,13 @@ Synthesize the paper comparisons into a novelty assessment:
    - 7-8: Genuine novelty in method, application, or insight
    - 9-10: Paradigm-shifting new approach
 
-Write assessment to `.rstack/novelty-assessment.md`.
+Write assessment to `novelty-assessment.md` at the project root.
 
 ## Step 3: Idea Refinement
 
 Based on the novelty assessment, produce a refined research statement. This is critical — `/experiment` consumes `refined-idea.md`, not the raw `idea.md`.
 
-Write `.rstack/refined-idea.md` with these sections (extracted from Ignis refine-idea-agent.ts):
+Write `refined-idea.md` at the project root with these sections (extracted from Ignis refine-idea-agent.ts):
 
 ```markdown
 # Refined Research Idea
@@ -122,7 +126,7 @@ Use AskUserQuestion:
 > {one sentence summary of the main novel contribution}.
 > {one sentence about the main overlap concern, if any}.
 >
-> The refined hypothesis is saved to `.rstack/refined-idea.md`.
+> The refined hypothesis is saved to `refined-idea.md`.
 >
 > RECOMMENDATION: Choose A to proceed with experiments.
 
@@ -132,13 +136,13 @@ Options:
 - C) Deepen literature — search for more papers in area X (loops back to /lit-review)
 - D) Pivot — the idea needs fundamental rethinking (loops back to idea.md)
 
-If B: ask what to change, update refined-idea.md, re-assess novelty.
+If B: ask what to change, update `refined-idea.md`, re-assess novelty.
 If C: suggest running /lit-review with more specific queries.
-If D: ask for the new direction, update idea.md, re-run from Step 0.
+If D: ask for the new direction, update `idea.md`, re-run from Step 0.
 
 ## Important Rules
 
 - Never tell the user their idea is novel when it clearly overlaps with existing work. Be honest.
 - Always name specific papers when discussing overlap. "Your approach resembles Smith et al. (2024)" not "there is some overlap."
 - If novelty score is below 4, strongly recommend pivoting or finding a sharper angle before spending GPU hours.
-- The refined-idea.md is the most important output. It must be specific enough that /experiment can generate code from it.
+- `refined-idea.md` is the most important output. It must be specific enough that /experiment can generate code from it.
