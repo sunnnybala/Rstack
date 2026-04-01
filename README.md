@@ -1,4 +1,4 @@
-# RStack — GStack for Research
+# RStack — Claude code for Research (Get to a paper 4X faster)
 
 Research automation skills for Claude Code. Type `/research` and go from idea to submittable paper. Each skill works standalone but chains together into a full pipeline.
 
