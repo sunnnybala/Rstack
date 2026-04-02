@@ -112,6 +112,28 @@ IDEA → /lit-review → /novelty-check → /experiment → /analyze → /write-
 
 Skills discover prior outputs by checking project root files and `.rstack/` plumbing. If `/novelty-check` finds `.rstack/lit-review.jsonl`, it uses it. If not, it runs a lightweight search. Each skill degrades gracefully when upstream outputs are missing.
 
+## Telemetry
+
+RStack follows GStack's three-tier privacy model for usage telemetry:
+
+| Tier | Local JSONL | Remote sync | Installation ID |
+|------|------------|-------------|-----------------|
+| off (default) | no | no | no |
+| anonymous | yes | yes | stripped |
+| community | yes | yes | included (random UUID) |
+
+```
+Skill preamble → .pending marker + _TEL_START timestamp
+Skill workflow runs
+Skill epilogue → compute duration → rstack-telemetry-log → skill-usage.jsonl
+                                                          └→ rstack-telemetry-sync (bg)
+                                                             └→ Supabase edge function
+```
+
+This is an intentional extension to RStack's "no backend" principle. The telemetry backend is optional infrastructure (sync exits silently without a configured URL), the local JSONL logging works standalone, and the Supabase project is a separate deployment step. The core skill pack remains pure SKILL.md files with no build step.
+
+Research-specific telemetry fields (not in GStack): `compute_provider`, `gpu_type`, `venue`, `pipeline_stage`. Error messages are sanitized client-side before writing to JSONL (paths and secrets stripped).
+
 ## What RStack does NOT do
 
 - **Full autopilot.** Sakana's AI Scientist has a 42% experiment failure rate. RStack keeps the human in the loop at every decision point.
