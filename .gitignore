@@ -1,6 +1,14 @@
 # RStack state (per-project, not committed)
 .rstack/
 
+# Reference repos (local only, not part of RStack)
+Ignis/
+autoresearch/
+gstack/
+
+# GStack debug logs
+.gstack/
+
 # OS files
 .DS_Store
 Thumbs.db
@@ -18,6 +26,26 @@ __pycache__/
 *.pyo
 .env
 venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
 
 # Node (if any tooling added later)
 node_modules/
+
+# Logs
+*.log
+
+# Build outputs
+dist/
+build/
+
+# Internal docs (not for public repo)
+productinsights.md
+
+# Credentials (defense in depth)
+credentials.json
+kaggle.json
+*.pem
+*.key
