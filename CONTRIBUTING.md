@@ -76,7 +76,7 @@ When a user types `/lit-review`, Claude reads `lit-review/SKILL.md` and follows 
 
 ## Conventions
 
-**Follow GStack patterns.** RStack is modeled on GStack's architecture. If you're unsure how to structure something, check how GStack does it.
+**Follow GStack patterns.** RStack is modeled on [GStack's](https://github.com/garrytan/gstack) architecture. If you're unsure how to structure something, check how GStack does it.
 
 **Work products go at the project root.** Skills write user-facing outputs (idea.md, paper.tex, figures) as normal visible files at the git root. Structured JSONL logs (lit-review.jsonl, experiments.jsonl) go in the hidden `.rstack/` plumbing directory. Use JSONL for structured data (one record per line, versioned with `"v": 1`). Use Markdown for human-readable outputs.
 
