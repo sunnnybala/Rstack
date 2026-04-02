@@ -73,7 +73,6 @@ for _PF in $(find ~/.rstack/analytics -maxdepth 1 -name '.pending-*' 2>/dev/null
     fi
     rm -f "$_PF" 2>/dev/null || true
   fi
-  break
 done
 
 # Project slug for state storage

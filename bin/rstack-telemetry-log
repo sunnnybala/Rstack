@@ -147,6 +147,12 @@ if command -v git >/dev/null 2>&1; then
   BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
 fi
 
+# ─── Validate outcome ────────────────────────────────────────
+case "$OUTCOME" in
+  success|error|abort|unknown) ;;
+  *) OUTCOME="unknown" ;;  # reject invalid/literal "OUTCOME" strings
+esac
+
 # ─── Construct and append JSON ───────────────────────────────
 mkdir -p "$ANALYTICS_DIR"
 

@@ -36,10 +36,10 @@ check() {
 
   case "$EXPECT" in
     deny)
-      # 4xx = blocked by RLS (good), 000 = network error
       case "$HTTP_CODE" in
-        4*|000) echo "PASS: $LABEL (HTTP $HTTP_CODE — blocked)"; PASS=$((PASS+1)) ;;
-        *)      echo "FAIL: $LABEL (HTTP $HTTP_CODE — expected 4xx)"; FAIL=$((FAIL+1)) ;;
+        000)  echo "SKIP: $LABEL (HTTP $HTTP_CODE — network error, server unreachable)" ;;
+        4*)   echo "PASS: $LABEL (HTTP $HTTP_CODE — blocked by RLS)"; PASS=$((PASS+1)) ;;
+        *)    echo "FAIL: $LABEL (HTTP $HTTP_CODE — expected 4xx)"; FAIL=$((FAIL+1)) ;;
       esac
       ;;
     allow)

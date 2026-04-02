@@ -59,7 +59,9 @@ CREATE POLICY "anon_insert_only" ON telemetry_events FOR INSERT WITH CHECK (true
 
 ALTER TABLE installations ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "anon_insert_only" ON installations FOR INSERT WITH CHECK (true);
-CREATE POLICY "anon_update_last_seen" ON installations FOR UPDATE USING (true) WITH CHECK (true);
+-- UPDATE restricted: edge function uses service role key (bypasses RLS).
+-- No anon UPDATE policy needed. If direct PostgREST access is required
+-- in the future, restrict to last_seen column only.
 
 ALTER TABLE update_checks ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "anon_insert_only" ON update_checks FOR INSERT WITH CHECK (true);

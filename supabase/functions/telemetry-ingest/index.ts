@@ -36,14 +36,14 @@ Deno.serve(async (req) => {
     return new Response("POST required", { status: 405 });
   }
 
-  // Check payload size
-  const contentLength = parseInt(req.headers.get("content-length") || "0");
-  if (contentLength > MAX_PAYLOAD_BYTES) {
-    return new Response("Payload too large", { status: 413 });
-  }
-
   try {
-    const body = await req.json();
+    // Check actual body size (don't trust Content-Length header)
+    const rawBody = await req.text();
+    if (rawBody.length > MAX_PAYLOAD_BYTES) {
+      return new Response("Payload too large", { status: 413 });
+    }
+
+    const body = JSON.parse(rawBody);
     const events: TelemetryEvent[] = Array.isArray(body) ? body : [body];
 
     if (events.length > MAX_BATCH_SIZE) {
