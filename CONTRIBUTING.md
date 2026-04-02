@@ -12,6 +12,29 @@ cd Rstack
 
 RStack skills are Markdown files that Claude Code discovers from `~/.claude/skills/`. The setup script symlinks your repo's skill directories there, so edits take effect immediately.
 
+## How to contribute
+
+### Reporting bugs
+
+[Open a bug report](https://github.com/sunnnybala/Rstack/issues/new?template=bug_report.md) with the skill name, steps to reproduce, and your environment (OS, Claude Code version, Python version).
+
+### Suggesting features
+
+[Open a feature request](https://github.com/sunnnybala/Rstack/issues/new?template=feature_request.md) describing the research workflow pain point and your proposed solution.
+
+### Submitting changes
+
+1. **Fork** the repository on GitHub
+2. **Clone** your fork: `git clone https://github.com/YOUR-USERNAME/Rstack.git`
+3. **Create a branch**: `git checkout -b my-feature`
+4. **Make your changes** (see conventions below)
+5. **Test** your changes (see testing section)
+6. **Commit** with a clear message (see commit style)
+7. **Push** to your fork: `git push origin my-feature`
+8. **Open a Pull Request** against `main`
+
+For small fixes (typos, one-line changes), you can edit directly on GitHub and open a PR from there.
+
 ## How skills work
 
 Each skill is a SKILL.md file with three parts:
@@ -53,7 +76,7 @@ When a user types `/lit-review`, Claude reads `lit-review/SKILL.md` and follows 
 
 ## Conventions
 
-**Follow GStack patterns.** RStack is modeled on GStack's architecture. If you're unsure how to structure something, check how GStack does it in the `gstack/` reference directory.
+**Follow GStack patterns.** RStack is modeled on GStack's architecture. If you're unsure how to structure something, check how GStack does it.
 
 **Work products go at the project root.** Skills write user-facing outputs (idea.md, paper.tex, figures) as normal visible files at the git root. Structured JSONL logs (lit-review.jsonl, experiments.jsonl) go in the hidden `.rstack/` plumbing directory. Use JSONL for structured data (one record per line, versioned with `"v": 1`). Use Markdown for human-readable outputs.
 
@@ -99,5 +122,12 @@ One logical change per commit. Bisectable history. Examples:
 ## What NOT to change
 
 - **ETHOS.md** — research philosophy is intentional, not generic
-- **Reference projects** (`gstack/`, `Ignis/`, `autoresearch/`) — these are read-only references
 - **Credentials** — never commit API keys, tokens, or auth state
+
+## Code of Conduct
+
+This project follows our [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold it.
+
+## Questions?
+
+Open a [GitHub issue](https://github.com/sunnnybala/Rstack/issues) — we're happy to help.

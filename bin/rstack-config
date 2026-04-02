@@ -14,7 +14,7 @@ STATE_DIR="${RSTACK_STATE_DIR:-$HOME/.rstack}"
 CONFIG_FILE="$STATE_DIR/config.yaml"
 
 CONFIG_HEADER='# rstack configuration — edit freely, changes take effect on next skill run.
-# Docs: https://github.com/dhruv/rstack
+# Docs: https://github.com/sunnnybala/Rstack
 #
 # ─── Compute ─────────────────────────────────────────────────────────
 # compute_preferred: modal    # modal | local
