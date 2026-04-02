@@ -107,6 +107,29 @@ Since RStack is pure SKILL.md files (no compiled code), testing is:
 
 4. **Setup test:** run `./setup` on a clean machine (or in a fresh directory)
 
+5. **Telemetry tests:**
+   ```bash
+   bash test/telemetry-test.sh
+   ```
+
+6. **Preamble consistency check:**
+   ```bash
+   bin/rstack-gen-preambles --check
+   ```
+
+## Telemetry integration
+
+Every skill must include telemetry in its preamble and epilogue. The pattern:
+
+1. **Preamble:** Gate JSONL write behind `_TEL != off`. Create `.pending-$_SESSION_ID` marker. Finalize stale pending markers.
+2. **Epilogue:** Compute duration. Remove pending marker. Call `rstack-telemetry-log` with outcome and research-specific fields.
+3. **First-run prompt:** Check `TEL_PROMPTED` and ask user about telemetry tier if not yet prompted.
+
+See `_shared/preamble.sh` and `_shared/epilogue.sh` for the reference implementations.
+Use `bin/rstack-gen-preambles` to regenerate preamble/epilogue sections after editing the reference files.
+
+When adding a new research skill, set the `--pipeline-stage` flag appropriately. Only set `--compute-provider` and `--gpu-type` if the skill involves compute.
+
 ## Project structure
 
 See CLAUDE.md for the full directory layout and state file reference.

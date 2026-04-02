@@ -124,6 +124,24 @@ bin/rstack-config set venue icml      # write
 bin/rstack-config list                # show all
 ```
 
+## Privacy & Telemetry
+
+RStack respects your privacy. Telemetry is **off by default**.
+
+| Tier | What's collected | Shared remotely |
+|------|-----------------|-----------------|
+| `off` (default) | Nothing | No |
+| `anonymous` | Skill name, duration, outcome, OS | Yes (no device ID) |
+| `community` | Same + stable device ID | Yes |
+
+No code, file paths, repo names, or research content is ever collected or sent.
+
+```bash
+rstack-config set telemetry community   # opt in
+rstack-config set telemetry off         # opt out
+rstack-analytics                        # see your local data
+```
+
 ## Comparison
 
 | | RStack | AutoResearch (Karpathy) | Sakana AI Scientist | Ignis |

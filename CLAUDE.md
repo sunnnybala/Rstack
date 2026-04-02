@@ -10,6 +10,12 @@ bin/rstack-config set venue icml  # write a config value
 bin/rstack-config list            # show all config
 bin/rstack-compute-detect         # check Modal, GPU, LaTeX availability
 bin/rstack-preflight train.py     # 30s CPU dry-run of experiment code
+bin/rstack-analytics              # usage dashboard (last 7 days)
+bin/rstack-analytics 30d          # last 30 days
+bin/rstack-analytics all          # all time
+bin/rstack-telemetry-log --skill qa --duration 60 --outcome success --session-id test-1  # log event
+bin/rstack-gen-preambles          # regenerate SKILL.md preamble/epilogue sections
+bin/rstack-gen-preambles --check  # dry-run: exit 1 if any SKILL.md is outdated
 ```
 
 ## Testing
@@ -38,9 +44,14 @@ rstack/
 │   ├── rstack-config       # YAML config read/write
 │   ├── rstack-slug         # Project slug from git remote
 │   ├── rstack-compute-detect  # Modal + GPU + LaTeX detection
-│   └── rstack-preflight    # 30s CPU dry-run for experiments
+│   ├── rstack-preflight    # 30s CPU dry-run for experiments
+│   ├── rstack-telemetry-log    # Append telemetry event to local JSONL
+│   ├── rstack-telemetry-sync   # Background sync to Supabase
+│   ├── rstack-analytics        # Local usage dashboard
+│   └── rstack-gen-preambles    # Template generator for SKILL.md sections
 ├── _shared/                # Shared reference files
 │   ├── preamble.sh         # Reference preamble (each skill inlines its own)
+│   ├── epilogue.sh         # Reference epilogue (telemetry finalization)
 │   ├── compute.md          # Modal CLI reference + artifact contract
 │   └── venues.md           # arXiv formatting rules (v1)
 ├── lit-review/SKILL.md     # Literature review skill
@@ -55,6 +66,12 @@ rstack/
 ├── ETHOS.md                # Research philosophy
 ├── ARCHITECTURE.md         # Why RStack is built this way
 ├── CONTRIBUTING.md         # How to add skills
+├── supabase/               # Telemetry backend
+│   ├── config.sh           # Public Supabase project config
+│   ├── migrations/         # Database schema
+│   ├── functions/          # Edge functions
+│   └── verify-rls.sh       # RLS smoke test
+├── test/                   # Test scripts
 ├── CHANGELOG.md            # Release notes
 └── README.md               # User guide
 ```
@@ -119,10 +136,27 @@ Rules (same as GStack):
 | `venue` | `arxiv` | /write-paper, /research |
 | `experiment_checkpoint` | `3` | /experiment (ask user every N runs) |
 | `proactive` | `true` | root SKILL.md routing |
-| `telemetry` | `off` | preamble analytics logging |
+| `telemetry` | `off` | preamble, rstack-telemetry-log (off/anonymous/community) |
 | `modal_installed` | (set by /setup) | /setup status tracking |
 | `modal_authenticated` | (set by /setup) | /setup status tracking |
 | `modal_default_gpu` | `A100` | /experiment cloud submission |
 | `latex_compiler` | `tectonic` | /write-paper compilation |
 | `update_check` | `true` | preamble (disable version check notifications) |
 | `auto_upgrade` | `false` | rstack-upgrade (auto-upgrade on session start) |
+
+## Telemetry
+
+Three tiers: `off` (default), `anonymous`, `community`.
+
+```bash
+bin/rstack-config set telemetry community   # enable with stable device ID
+bin/rstack-config set telemetry anonymous   # enable without device ID
+bin/rstack-config set telemetry off         # disable all telemetry
+bin/rstack-analytics                        # view local usage dashboard
+```
+
+When not `off`, skill events are logged to `~/.rstack/analytics/skill-usage.jsonl` (local, inspectable).
+Events sync to Supabase in background (rate-limited, 5 min) when a URL is configured.
+Local-only fields (`_repo_slug`, `_branch`) are stripped before sending.
+Error messages are sanitized client-side (paths and secrets stripped) before writing to JSONL.
+Installation ID (UUID) is only generated when the user chooses community tier.
