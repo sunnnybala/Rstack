@@ -1,8 +1,8 @@
-# RStack — Claude code for Research (Get to a paper 4X faster)
+# RStack — Claude code for Research (Get to a paper 5X faster)
 
 Research automation skills for Claude Code. Type `/research` and go from idea to submittable paper. Each skill works standalone but chains together into a full pipeline.
 
-A PhD student with a deadline spends 70% of their time on grunt work: finding papers, provisioning GPUs, formatting LaTeX. RStack compresses that to near-zero. The thinking stays with the researcher.
+A PhD student with a deadline spends 80% of their time on grunt work: finding papers, provisioning GPUs, formatting LaTeX. RStack compresses that to near-zero. The thinking stays with the researcher.
 
 ## Skills
 
