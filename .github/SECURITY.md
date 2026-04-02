@@ -6,7 +6,7 @@ If you discover a security vulnerability in RStack, please report it responsibly
 
 **Do NOT open a public GitHub issue for security vulnerabilities.**
 
-Instead, email **rstack-security@proton.me** with:
+Instead, email **dhruvagarwal5018@gmail.com** with:
 
 1. Description of the vulnerability
 2. Steps to reproduce

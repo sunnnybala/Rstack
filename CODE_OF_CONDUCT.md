@@ -40,7 +40,7 @@ an individual is officially representing the community in public spaces.
 ## Enforcement
 
 Instances of unacceptable behavior may be reported to the project maintainers at
-**rstack-conduct@proton.me** (or open a GitHub issue if you prefer public reporting).
+**dhruvagarwal5018@gmail.com** (or open a GitHub issue if you prefer public reporting).
 
 All complaints will be reviewed and investigated promptly and fairly.
 

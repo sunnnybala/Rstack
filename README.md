@@ -1,5 +1,9 @@
 # RStack — Claude code for Research (Get to a paper 5X faster)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.1.3-blue.svg)](CHANGELOG.md)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
 Research automation skills for Claude Code. Type `/research` and go from idea to submittable paper. Each skill works standalone but chains together into a full pipeline.
 
 A PhD student with a deadline spends 80% of their time on grunt work: finding papers, provisioning GPUs, formatting LaTeX. RStack compresses that to near-zero. The thinking stays with the researcher.
