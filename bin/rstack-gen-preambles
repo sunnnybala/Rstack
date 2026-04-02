@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+# rstack-gen-preambles — generate preamble and epilogue blocks in SKILL.md files
+#
+# Reads _shared/preamble.sh and _shared/epilogue.sh as templates.
+# Replaces content between marker comments in each SKILL.md.
+#
+# Usage:
+#   rstack-gen-preambles          # update all SKILL.md files
+#   rstack-gen-preambles --check  # dry-run, exit 1 if any outdated
+#
+# Markers in SKILL.md (inside bash code blocks):
+#   # --- GENERATED PREAMBLE START ---
+#   ... replaced content ...
+#   # --- GENERATED PREAMBLE END ---
+#
+#   # --- GENERATED EPILOGUE START ---
+#   ... replaced content ...
+#   # --- GENERATED EPILOGUE END ---
+set -euo pipefail
+
+RSTACK_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+PREAMBLE_TEMPLATE="$RSTACK_DIR/_shared/preamble.sh"
+EPILOGUE_TEMPLATE="$RSTACK_DIR/_shared/epilogue.sh"
+CHECK_MODE=false
+OUTDATED=0
+UPDATED=0
+
+if [ "${1:-}" = "--check" ]; then
+  CHECK_MODE=true
+fi
+
+if [ ! -f "$PREAMBLE_TEMPLATE" ]; then
+  echo "ERROR: $PREAMBLE_TEMPLATE not found" >&2
+  exit 1
+fi
+
+# ─── Find all SKILL.md files ────────────────────────────────
+SKILL_FILES="$(find "$RSTACK_DIR" -maxdepth 2 -name 'SKILL.md' -not -path '*/.git/*' -not -path '*/gstack/*' -not -path '*/node_modules/*' 2>/dev/null | sort)"
+
+if [ -z "$SKILL_FILES" ]; then
+  echo "No SKILL.md files found in $RSTACK_DIR"
+  exit 0
+fi
+
+for SKILL_FILE in $SKILL_FILES; do
+  # Extract skill name from frontmatter
+  SKILL_NAME="$(awk '/^---$/{f++} f==1 && /^name:/{print $2; exit}' "$SKILL_FILE")"
+  if [ -z "$SKILL_NAME" ]; then
+    echo "SKIP: $SKILL_FILE (no name: in frontmatter)"
+    continue
+  fi
+
+  # Check for preamble markers
+  if ! grep -q '# --- GENERATED PREAMBLE START ---' "$SKILL_FILE" 2>/dev/null; then
+    if [ "$CHECK_MODE" = "true" ]; then
+      echo "OUTDATED: $SKILL_FILE (missing preamble markers — run rstack-gen-preambles to add them)"
+      OUTDATED=$((OUTDATED + 1))
+    else
+      echo "SKIP: $SKILL_FILE (no preamble markers — add markers manually first)"
+    fi
+    continue
+  fi
+
+  # Generate preamble content with SKILL_NAME substituted
+  PREAMBLE_CONTENT="$(sed "s/SKILL_NAME/$SKILL_NAME/g" "$PREAMBLE_TEMPLATE")"
+
+  # Generate epilogue content if template exists
+  EPILOGUE_CONTENT=""
+  if [ -f "$EPILOGUE_TEMPLATE" ]; then
+    EPILOGUE_CONTENT="$(sed "s/SKILL_NAME/$SKILL_NAME/g" "$EPILOGUE_TEMPLATE")"
+  fi
+
+  # Extract current preamble between markers
+  CURRENT_PREAMBLE="$(awk '/# --- GENERATED PREAMBLE START ---/{found=1; next} /# --- GENERATED PREAMBLE END ---/{found=0} found' "$SKILL_FILE")"
+
+  # Check if preamble needs update
+  PREAMBLE_CHANGED=false
+  if [ "$CURRENT_PREAMBLE" != "$PREAMBLE_CONTENT" ]; then
+    PREAMBLE_CHANGED=true
+  fi
+
+  # Check epilogue if markers exist
+  EPILOGUE_CHANGED=false
+  if grep -q '# --- GENERATED EPILOGUE START ---' "$SKILL_FILE" 2>/dev/null && [ -n "$EPILOGUE_CONTENT" ]; then
+    CURRENT_EPILOGUE="$(awk '/# --- GENERATED EPILOGUE START ---/{found=1; next} /# --- GENERATED EPILOGUE END ---/{found=0} found' "$SKILL_FILE")"
+    if [ "$CURRENT_EPILOGUE" != "$EPILOGUE_CONTENT" ]; then
+      EPILOGUE_CHANGED=true
+    fi
+  fi
+
+  if [ "$PREAMBLE_CHANGED" = "false" ] && [ "$EPILOGUE_CHANGED" = "false" ]; then
+    echo "OK: $SKILL_FILE ($SKILL_NAME)"
+    continue
+  fi
+
+  if [ "$CHECK_MODE" = "true" ]; then
+    echo "OUTDATED: $SKILL_FILE ($SKILL_NAME)"
+    OUTDATED=$((OUTDATED + 1))
+    continue
+  fi
+
+  # Replace preamble content between markers
+  TMPFILE="$(mktemp "${SKILL_FILE}.XXXXXX")"
+  awk -v content="$PREAMBLE_CONTENT" '
+    /# --- GENERATED PREAMBLE START ---/ {
+      print
+      print content
+      skip = 1
+      next
+    }
+    /# --- GENERATED PREAMBLE END ---/ {
+      skip = 0
+      print
+      next
+    }
+    !skip { print }
+  ' "$SKILL_FILE" > "$TMPFILE"
+
+  # Replace epilogue if markers exist and content available
+  if [ "$EPILOGUE_CHANGED" = "true" ] && [ -n "$EPILOGUE_CONTENT" ]; then
+    TMPFILE2="$(mktemp "${SKILL_FILE}.XXXXXX")"
+    awk -v content="$EPILOGUE_CONTENT" '
+      /# --- GENERATED EPILOGUE START ---/ {
+        print
+        print content
+        skip = 1
+        next
+      }
+      /# --- GENERATED EPILOGUE END ---/ {
+        skip = 0
+        print
+        next
+      }
+      !skip { print }
+    ' "$TMPFILE" > "$TMPFILE2"
+    mv "$TMPFILE2" "$TMPFILE"
+  fi
+
+  mv "$TMPFILE" "$SKILL_FILE"
+  echo "UPDATED: $SKILL_FILE ($SKILL_NAME)"
+  UPDATED=$((UPDATED + 1))
+done
+
+echo ""
+if [ "$CHECK_MODE" = "true" ]; then
+  if [ "$OUTDATED" -gt 0 ]; then
+    echo "$OUTDATED file(s) outdated. Run 'rstack-gen-preambles' to update."
+    exit 1
+  else
+    echo "All SKILL.md files up to date."
+    exit 0
+  fi
+else
+  echo "$UPDATED file(s) updated."
+fi
