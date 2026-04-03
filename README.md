@@ -1,4 +1,4 @@
-# RStack — Claude code for Research (Get to a paper 5X faster)
+# RStack — Claude code for Research 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-0.1.3-blue.svg)](CHANGELOG.md)
