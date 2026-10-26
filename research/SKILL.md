@@ -26,7 +26,7 @@ _PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 mkdir -p ~/.rstack/sessions ~/.rstack/analytics "$_PROJECT_ROOT/.rstack"
 touch ~/.rstack/sessions/"$PPID"
 _RSTACK_CONFIG="$(dirname "$(dirname "$0")")/bin/rstack-config"
-_UPD=$("$HOME/.claude/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
+_UPD=$("$HOME/.Codex/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
 _VENUE=$("$_RSTACK_CONFIG" get venue 2>/dev/null || echo "arxiv")
 _COMPUTE=$("$_RSTACK_CONFIG" get compute_preferred 2>/dev/null || echo "modal")
@@ -73,7 +73,7 @@ Tell the user: "Starting the full research pipeline. I'll guide you through lite
 
 ## Phase 2: Literature Review
 
-Read the `/lit-review` skill file at `~/.claude/skills/rstack/lit-review/SKILL.md` and follow it inline, skipping its preamble bash block (already run). Note: each subsequent bash block in the sub-skill re-derives `_PROJECT_ROOT` independently, so those still run normally.
+Read the `/lit-review` skill file at `~/.Codex/skills/rstack/lit-review/SKILL.md` and follow it inline, skipping its preamble bash block (already run). Note: each subsequent bash block in the sub-skill re-derives `_PROJECT_ROOT` independently, so those still run normally.
 
 After completion, check: does `.rstack/lit-review.jsonl` (plumbing) exist and have content?
 - If YES: proceed to Phase 3
@@ -81,7 +81,7 @@ After completion, check: does `.rstack/lit-review.jsonl` (plumbing) exist and ha
 
 ## Phase 3: Novelty Assessment + Idea Refinement
 
-Read the `/novelty-check` skill file at `~/.claude/skills/rstack/novelty-check/SKILL.md` and follow it inline, skipping its preamble.
+Read the `/novelty-check` skill file at `~/.Codex/skills/rstack/novelty-check/SKILL.md` and follow it inline, skipping its preamble.
 
 After completion, check: does `refined-idea.md` exist at the project root?
 - If YES and novelty score >= 4: proceed to Phase 4
@@ -92,7 +92,7 @@ After completion, check: does `refined-idea.md` exist at the project root?
 
 ## Phase 4: Experiments
 
-Read the `/experiment` skill file at `~/.claude/skills/rstack/experiment/SKILL.md` and follow it inline, skipping its preamble.
+Read the `/experiment` skill file at `~/.Codex/skills/rstack/experiment/SKILL.md` and follow it inline, skipping its preamble.
 
 This phase is iterative. The /experiment skill runs multiple experiment cycles with its own internal checkpoints (every 3 runs by default).
 
@@ -108,7 +108,7 @@ After the user says "stop" or "enough experiments":
 
 ## Phase 5: Results Analysis
 
-Read the `/analyze-results` skill file at `~/.claude/skills/rstack/analyze-results/SKILL.md` and follow it inline, skipping its preamble.
+Read the `/analyze-results` skill file at `~/.Codex/skills/rstack/analyze-results/SKILL.md` and follow it inline, skipping its preamble.
 
 After completion, check: do figures exist in `analysis/figures/`?
 - If YES: proceed to Phase 6
@@ -116,7 +116,7 @@ After completion, check: do figures exist in `analysis/figures/`?
 
 ## Phase 6: Paper Writing
 
-Read the `/write-paper` skill file at `~/.claude/skills/rstack/write-paper/SKILL.md` and follow it inline, skipping its preamble.
+Read the `/write-paper` skill file at `~/.Codex/skills/rstack/write-paper/SKILL.md` and follow it inline, skipping its preamble.
 
 After completion, check: does `paper.pdf` exist at the project root?
 - If YES: proceed to Final

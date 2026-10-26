@@ -26,7 +26,7 @@ mkdir -p ~/.rstack/sessions ~/.rstack/analytics "$_PROJECT_ROOT/.rstack"
 touch ~/.rstack/sessions/"$PPID"
 find ~/.rstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
 _RSTACK_CONFIG="$(dirname "$(dirname "$0")")/bin/rstack-config"
-_UPD=$("$HOME/.claude/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
+_UPD=$("$HOME/.Codex/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
 _VENUE=$("$_RSTACK_CONFIG" get venue 2>/dev/null || echo "arxiv")
 _COMPUTE=$("$_RSTACK_CONFIG" get compute_preferred 2>/dev/null || echo "modal")

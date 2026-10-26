@@ -25,7 +25,7 @@ _PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 mkdir -p "$_PROJECT_ROOT/.rstack"
 
 # Update check
-_UPD=$("$HOME/.claude/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
+_UPD=$("$HOME/.Codex/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
 
 # Detect available state files (work products at root, plumbing in .rstack/)
@@ -77,10 +77,10 @@ echo "LATEX_COMPILER: $_LATEX_COMPILER"
 
 # Detect rstack skill root for templates
 _SKILL_ROOT=""
-if [ -d "$HOME/.claude/skills/rstack" ]; then
-  _SKILL_ROOT="$HOME/.claude/skills/rstack"
-elif [ -d ".claude/skills/rstack" ]; then
-  _SKILL_ROOT="$(pwd)/.claude/skills/rstack"
+if [ -d "$HOME/.Codex/skills/rstack" ]; then
+  _SKILL_ROOT="$HOME/.Codex/skills/rstack"
+elif [ -d ".Codex/skills/rstack" ]; then
+  _SKILL_ROOT="$(pwd)/.Codex/skills/rstack"
 fi
 echo "SKILL_ROOT: ${_SKILL_ROOT:-NOT_FOUND}"
 
@@ -166,7 +166,7 @@ Take the user's response and use it as the idea context for the rest of the work
 Check venue configuration. Use `rstack-config get venue` or default to `arxiv`.
 
 ```bash
-_RSTACK_CONFIG="$HOME/.claude/skills/rstack/bin/rstack-config"
+_RSTACK_CONFIG="$HOME/.Codex/skills/rstack/bin/rstack-config"
 "$_RSTACK_CONFIG" get venue 2>/dev/null || echo "venue: arxiv"
 ```
 

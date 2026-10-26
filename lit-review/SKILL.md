@@ -26,7 +26,7 @@ mkdir -p ~/.rstack/sessions ~/.rstack/analytics "$_PROJECT_ROOT/.rstack"
 touch ~/.rstack/sessions/"$PPID"
 find ~/.rstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
 _RSTACK_CONFIG="$(dirname "$(dirname "$0")")/bin/rstack-config"
-_UPD=$("$HOME/.claude/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
+_UPD=$("$HOME/.Codex/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "PROJECT_ROOT: $_PROJECT_ROOT"
@@ -76,7 +76,7 @@ Convert the research idea into academic search terms. Generate 2-3 queries with 
 
 Use two search methods:
 
-**Method A — WebSearch (Claude's built-in tool):**
+**Method A — WebSearch (Codex's built-in tool):**
 Search for each query. Focus on finding academic papers, not blog posts or news articles.
 Good search prefixes: "site:arxiv.org", "site:semanticscholar.org", "NeurIPS 2024", "ICML 2025"
 

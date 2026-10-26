@@ -16,7 +16,7 @@ allowed-tools:
 ```bash
 mkdir -p ~/.rstack/analytics
 echo '{"skill":"rstack-upgrade","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> ~/.rstack/analytics/skill-usage.jsonl 2>/dev/null || true
-_RSTACK_DIR="$HOME/.claude/skills/rstack"
+_RSTACK_DIR="$HOME/.Codex/skills/rstack"
 [ -d "$_RSTACK_DIR" ] || _RSTACK_DIR="$(cd "$(dirname "$0")/.." 2>/dev/null && pwd)"
 _LOCAL_VER="$(cat "$_RSTACK_DIR/VERSION" 2>/dev/null | tr -d '[:space:]')"
 echo "RSTACK_DIR: $_RSTACK_DIR"
@@ -32,7 +32,7 @@ This flow is called from the preamble of any skill when `UPGRADE_AVAILABLE <old>
 If invoked standalone (not from another skill's preamble), force-check:
 
 ```bash
-"$HOME/.claude/skills/rstack/bin/rstack-update-check" --force 2>/dev/null || true
+"$HOME/.Codex/skills/rstack/bin/rstack-update-check" --force 2>/dev/null || true
 ```
 
 Parse the output. If `UPGRADE_AVAILABLE <old> <new>`, proceed. If nothing (up to date), tell user: "RStack is up to date (v{version})." and stop.
@@ -49,7 +49,7 @@ Use AskUserQuestion:
 > D) Never ask again
 
 If A or B: proceed to Step 3.
-If B: also run `~/.claude/skills/rstack/bin/rstack-config set auto_upgrade true`.
+If B: also run `~/.Codex/skills/rstack/bin/rstack-config set auto_upgrade true`.
 If C: write snooze state:
 
 ```bash
@@ -66,12 +66,12 @@ echo "$_REMOTE_VER $_LEVEL $(date +%s)" > "$_SNOOZE_FILE"
 
 Tell user: "Snoozed. I'll remind you in {24h/48h/7d depending on level}." Continue with the original skill.
 
-If D: run `~/.claude/skills/rstack/bin/rstack-config set update_check false`. Tell user: "Update checks disabled. Re-enable anytime with `bin/rstack-config set update_check true`." Continue with the original skill.
+If D: run `~/.Codex/skills/rstack/bin/rstack-config set update_check false`. Tell user: "Update checks disabled. Re-enable anytime with `bin/rstack-config set update_check true`." Continue with the original skill.
 
 ### Step 3: Run the upgrade
 
 ```bash
-_RSTACK_DIR="$HOME/.claude/skills/rstack"
+_RSTACK_DIR="$HOME/.Codex/skills/rstack"
 _OLD_VER="$(cat "$_RSTACK_DIR/VERSION" 2>/dev/null | tr -d '[:space:]')"
 
 cd "$_RSTACK_DIR"

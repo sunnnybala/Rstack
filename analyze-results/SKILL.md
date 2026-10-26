@@ -23,7 +23,7 @@ _PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 mkdir -p ~/.rstack/sessions ~/.rstack/analytics "$_PROJECT_ROOT/.rstack"
 touch ~/.rstack/sessions/"$PPID"
 _RSTACK_CONFIG="$(dirname "$(dirname "$0")")/bin/rstack-config"
-_UPD=$("$HOME/.claude/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
+_UPD=$("$HOME/.Codex/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "PROJECT_ROOT: $_PROJECT_ROOT"

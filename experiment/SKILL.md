@@ -26,7 +26,7 @@ mkdir -p ~/.rstack/sessions ~/.rstack/analytics "$_PROJECT_ROOT/.rstack" "$_PROJ
 touch ~/.rstack/sessions/"$PPID"
 find ~/.rstack/sessions -mmin +120 -type f -delete 2>/dev/null || true
 _RSTACK_CONFIG="$(dirname "$(dirname "$0")")/bin/rstack-config"
-_UPD=$("$HOME/.claude/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
+_UPD=$("$HOME/.Codex/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
 _COMPUTE=$("$_RSTACK_CONFIG" get compute_preferred 2>/dev/null || echo "modal")
 _CHECKPOINT=$("$_RSTACK_CONFIG" get experiment_checkpoint 2>/dev/null || echo "3")
@@ -248,7 +248,7 @@ If the user has previously said "auto" or is in `--auto` mode, skip this confirm
 
 ## Step 6: Cloud Execution
 
-Run the experiment on Modal. Claude runs the command directly (same as GStack runs `git push`):
+Run the experiment on Modal. Codex runs the command directly (same as GStack runs `git push`):
 
 ```bash
 _PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)

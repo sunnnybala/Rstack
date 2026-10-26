@@ -2,7 +2,7 @@
 name: rstack
 version: 0.1.0
 description: |
-  Research automation skills for Claude Code. Full pipeline from idea to
+  Research automation skills for Codex. Full pipeline from idea to
   submittable paper. Skills: /lit-review, /novelty-check, /experiment,
   /analyze-results, /write-paper, /research (orchestrator), /setup.
 allowed-tools:
@@ -18,7 +18,7 @@ _PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 mkdir -p ~/.rstack/sessions ~/.rstack/analytics "$_PROJECT_ROOT/.rstack"
 touch ~/.rstack/sessions/"$PPID"
 _RSTACK_CONFIG="$(dirname "$0")/bin/rstack-config"
-_UPD=$("$HOME/.claude/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
+_UPD=$("$HOME/.Codex/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
 _BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
 echo "PROJECT_ROOT: $_PROJECT_ROOT"

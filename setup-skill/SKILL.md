@@ -19,7 +19,7 @@ allowed-tools:
 _PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 mkdir -p ~/.rstack/analytics "$_PROJECT_ROOT/.rstack"
 echo '{"skill":"setup","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' >> ~/.rstack/analytics/skill-usage.jsonl 2>/dev/null || true
-_UPD=$("$HOME/.claude/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
+_UPD=$("$HOME/.Codex/skills/rstack/bin/rstack-update-check" 2>/dev/null || true)
 [ -n "$_UPD" ] && echo "$_UPD" || true
 echo "PROJECT_ROOT: $_PROJECT_ROOT"
 echo "=== RStack Setup ==="
@@ -33,7 +33,7 @@ If output shows `JUST_UPGRADED <from> <to>`: tell user "Running RStack v{to} (ju
 Run the compute detection script:
 
 ```bash
-~/.claude/skills/rstack/bin/rstack-compute-detect
+~/.Codex/skills/rstack/bin/rstack-compute-detect
 ```
 
 Note the output. This shows what's installed and what's authenticated.
@@ -57,16 +57,16 @@ If A: Run `pip install modal`. Then run `modal token new` — this opens a brows
 
 **If Modal installed but NOT authenticated:**
 Tell user: "Modal is installed but not authenticated."
-Run: Tell the user to execute `modal token new` in their terminal (or type `! modal token new` in Claude Code's prompt to run it in-session). Verify with `modal token info`.
+Run: Tell the user to execute `modal token new` in their terminal (or type `! modal token new` in Codex's prompt to run it in-session). Verify with `modal token info`.
 
 **If Modal installed AND authenticated:**
 Tell user: "Modal is configured. Default GPU will be A100."
 
 Save status:
 ```bash
-~/.claude/skills/rstack/bin/rstack-config set modal_installed true
-~/.claude/skills/rstack/bin/rstack-config set modal_authenticated true
-~/.claude/skills/rstack/bin/rstack-config set modal_default_gpu A100
+~/.Codex/skills/rstack/bin/rstack-config set modal_installed true
+~/.Codex/skills/rstack/bin/rstack-config set modal_authenticated true
+~/.Codex/skills/rstack/bin/rstack-config set modal_default_gpu A100
 ```
 
 ## Step 3: Configure LaTeX Compiler
@@ -88,7 +88,7 @@ If A:
 
 Save status:
 ```bash
-~/.claude/skills/rstack/bin/rstack-config set latex_compiler tectonic
+~/.Codex/skills/rstack/bin/rstack-config set latex_compiler tectonic
 ```
 
 **If already installed:**
@@ -104,7 +104,7 @@ Use AskUserQuestion:
 
 Save choice:
 ```bash
-~/.claude/skills/rstack/bin/rstack-config set venue arxiv
+~/.Codex/skills/rstack/bin/rstack-config set venue arxiv
 ```
 
 ## Step 5: Mark Complete
